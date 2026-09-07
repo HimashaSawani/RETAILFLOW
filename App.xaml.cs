@@ -1,6 +1,5 @@
-using System.Configuration;
-using System.Data;
 using System.Windows;
+using RetailFlow.Data;
 
 namespace RetailFlow;
 
@@ -9,4 +8,14 @@ namespace RetailFlow;
 /// </summary>
 public partial class App : Application
 {
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        // Automatically ensure SQLite database and tables are created upon startup
+        using (var context = new AppDbContext())
+        {
+            context.Database.EnsureCreated();
+        }
+    }
 }
