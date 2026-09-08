@@ -35,7 +35,7 @@
 
         <Style x:Key="AddBtnStyle" TargetType="Button">
             <Setter Property="Height" Value="40"/>
-            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Padding" Value="18,0"/>
             <Setter Property="Background" Value="#2563EB"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="14"/>
@@ -51,7 +51,7 @@
 
         <Style x:Key="EditBtnStyle" TargetType="Button">
             <Setter Property="Height" Value="38"/>
-            <Setter Property="Width" Value="100"/>
+            <Setter Property="Width" Value="90"/>
             <Setter Property="Background" Value="#0284C7"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="14"/>
@@ -67,7 +67,7 @@
 
         <Style x:Key="DeleteBtnStyle" TargetType="Button">
             <Setter Property="Height" Value="38"/>
-            <Setter Property="Width" Value="100"/>
+            <Setter Property="Width" Value="90"/>
             <Setter Property="Background" Value="#DC2626"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="14"/>
@@ -115,120 +115,131 @@
                     Command="{Binding AddProductCommand}"/>
         </Grid>
 
-        <!-- Product DataGrid -->
+        <!-- Product DataGrid & Empty State -->
         <Border Grid.Row="2"
                 Background="White"
                 BorderBrush="#E2E8F0"
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="2">
-            <DataGrid ItemsSource="{Binding Products}"
-                      SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      IsReadOnly="True"
-                      SelectionMode="Single"
-                      GridLinesVisibility="Horizontal"
-                      HorizontalGridLinesBrush="#EDF2F7"
-                      VerticalGridLinesBrush="Transparent"
-                      HeadersVisibility="Column"
-                      BorderThickness="0"
-                      Background="White"
-                      RowHeight="44"
-                      FontSize="14">
-                
-                <DataGrid.ColumnHeaderStyle>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#F1F5F9"/>
-                        <Setter Property="Foreground" Value="#475569"/>
-                        <Setter Property="FontWeight" Value="SemiBold"/>
-                        <Setter Property="FontSize" Value="13"/>
-                        <Setter Property="Height" Value="40"/>
-                        <Setter Property="Padding" Value="12,0"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Setter Property="BorderBrush" Value="#CBD5E1"/>
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
+            <Grid>
+                <!-- Empty State Message -->
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding Products.Count, Converter={StaticResource BoolToVis}, ConverterParameter=Empty}">
+                    <TextBlock Text="📦" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="No products found." FontSize="16" FontWeight="SemiBold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Click '+ Add Product' to create your first product." FontSize="13" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                </StackPanel>
 
-                <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#E0E7FF"/>
-                                <Setter Property="Foreground" Value="#1E1B4B"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F8FAFC"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.RowStyle>
+                <DataGrid ItemsSource="{Binding Products}"
+                          SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#EDF2F7"
+                          VerticalGridLinesBrush="Transparent"
+                          HeadersVisibility="Column"
+                          BorderThickness="0"
+                          Background="White"
+                          RowHeight="44"
+                          FontSize="14">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="120">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="Padding" Value="12,0"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F1F5F9"/>
+                            <Setter Property="Foreground" Value="#475569"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontSize" Value="13"/>
+                            <Setter Property="Height" Value="40"/>
+                            <Setter Property="Padding" Value="12,0"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
 
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Padding" Value="12,0"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#E0E7FF"/>
+                                    <Setter Property="Foreground" Value="#1E1B4B"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
 
-                    <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="1.2*">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Padding" Value="12,0"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Padding" Value="12,0"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Price" Binding="{Binding SellingPrice, StringFormat={}{0:N2}}" Width="120">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="Foreground" Value="#0F766E"/>
-                                <Setter Property="Padding" Value="12,0"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="TextAlignment" Value="Right"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Padding" Value="12,0"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Stock" Binding="{Binding StockQuantity}" Width="100">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="Padding" Value="12,0"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="TextAlignment" Value="Right"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="1.2*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Padding" Value="12,0"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Reorder Level" Binding="{Binding ReorderLevel}" Width="110">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="#64748B"/>
-                                <Setter Property="Padding" Value="12,0"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="TextAlignment" Value="Right"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                        <DataGridTextColumn Header="Price" Binding="{Binding SellingPrice, StringFormat={}{0:N2}}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Foreground" Value="#0F766E"/>
+                                    <Setter Property="Padding" Value="12,0"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Stock" Binding="{Binding StockQuantity}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Padding" Value="12,0"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Reorder Level" Binding="{Binding ReorderLevel}" Width="110">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="Padding" Value="12,0"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </Border>
 
         <!-- Footer / Action Buttons & Status -->

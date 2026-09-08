@@ -1,0 +1,240 @@
+<UserControl x:Class="RetailFlow.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:RetailFlow.ViewModels"
+             xmlns:helpers="clr-namespace:RetailFlow.Helpers"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1000"
+             FontFamily="Segoe UI"
+             Background="#F8FAFC">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <helpers:BarHeightConverter x:Key="BarHeightConv"/>
+
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+        </Style>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0"
+                   Text="SALES DASHBOARD"
+                   Style="{StaticResource HeaderStyle}"
+                   Margin="0,0,0,22"/>
+
+        <!-- 4 Top KPI Metric Cards -->
+        <Grid Grid.Row="1" Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Today's Sales -->
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" BorderBrush="#BBF7D0" Background="#F0FDF4">
+                <StackPanel>
+                    <TextBlock Text="TODAY'S SALES" FontSize="12" FontWeight="Bold" Foreground="#15803D" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding TodaySales, StringFormat='Rs. {0:N0}'}" FontSize="24" FontWeight="Bold" Foreground="#166534"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 2: Transactions -->
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}" BorderBrush="#BFDBFE" Background="#EFF6FF">
+                <StackPanel>
+                    <TextBlock Text="TRANSACTIONS" FontSize="12" FontWeight="Bold" Foreground="#1D4ED8" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding TodayTransactions}" FontSize="24" FontWeight="Bold" Foreground="#1E40AF"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 3: Total Products -->
+            <Border Grid.Column="4" Style="{StaticResource CardStyle}" BorderBrush="#E9D5FF" Background="#FAF5FF">
+                <StackPanel>
+                    <TextBlock Text="PRODUCTS" FontSize="12" FontWeight="Bold" Foreground="#7E22CE" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding TotalProducts}" FontSize="24" FontWeight="Bold" Foreground="#6B21A8"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 4: Low Stock -->
+            <Border Grid.Column="6" Style="{StaticResource CardStyle}" BorderBrush="#FECACA" Background="#FEF2F2">
+                <StackPanel>
+                    <TextBlock Text="LOW STOCK" FontSize="12" FontWeight="Bold" Foreground="#DC2626" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding LowStockProducts}" FontSize="24" FontWeight="Bold" Foreground="#991B1B"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Bottom Grid: Best Selling Products (Left) + Sales Chart (Right) -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="1.4*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Best-Selling Products Card -->
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Best-selling products"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="#1E293B"
+                               Margin="0,0,0,16"/>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding TopProducts}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="#F1F5F9"
+                              HeadersVisibility="Column"
+                              BorderThickness="0"
+                              RowHeight="40"
+                              FontSize="14">
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F8FAFC"/>
+                                <Setter Property="Foreground" Value="#64748B"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="Height" Value="36"/>
+                                <Setter Property="Padding" Value="10,0"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="#1E293B"/>
+                                        <Setter Property="Padding" Value="10,0"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Header="Units Sold" Binding="{Binding UnitsSold}" Width="110">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="#2563EB"/>
+                                        <Setter Property="Padding" Value="10,0"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!-- Sales Bar Chart Card -->
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Sales Chart (Last 7 Days)"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="#1E293B"
+                               Margin="0,0,0,16"/>
+
+                    <!-- Custom Visual Bar Chart -->
+                    <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                        <ItemsControl ItemsSource="{Binding WeeklySales}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="6,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Top Sales Amount -->
+                                        <TextBlock Grid.Row="0"
+                                                   Text="{Binding TotalSales, StringFormat='{}{0:N0}'}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#64748B"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,0,0,6"/>
+
+                                        <!-- Bar Track & Dynamic Fill -->
+                                        <Grid Grid.Row="1" VerticalAlignment="Bottom" Height="140">
+                                            <Border Background="#2563EB"
+                                                    CornerRadius="6,6,0,0"
+                                                    Width="34"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Bottom">
+                                                <Border.Height>
+                                                    <MultiBinding Converter="{StaticResource BarHeightConv}">
+                                                        <Binding Path="BarHeightRatio"/>
+                                                    </MultiBinding>
+                                                </Border.Height>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Day Label -->
+                                        <TextBlock Grid.Row="2"
+                                                   Text="{Binding DayName}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#334155"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,8,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
