@@ -7,11 +7,49 @@
         xmlns:vm="clr-namespace:RetailFlow.ViewModels"
         mc:Ignorable="d"
         Title="RetailFlow - Retail Management System" 
-        Height="700" Width="1000"
-        MinHeight="600" MinWidth="850"
+        Height="720" Width="1100"
+        MinHeight="620" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         Background="#F1F5F9"
         FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <!-- DataTemplates for Module Views -->
+        <DataTemplate DataType="{x:Type vm:ProductManagementViewModel}">
+            <views:ProductManagementView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:StockManagementViewModel}">
+            <views:StockManagementView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:PosViewModel}">
+            <views:PosView/>
+        </DataTemplate>
+
+        <!-- Navigation Button Style -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1E293B"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -26,6 +64,7 @@
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="32"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -37,17 +76,36 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Text="RetailFlow" FontSize="20" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                    <TextBlock Text=" | POS &amp; Inventory" FontSize="14" Foreground="#94A3B8" VerticalAlignment="Center" Margin="6,0,0,0"/>
                 </StackPanel>
 
-                <!-- Module Indicator -->
-                <Border Grid.Column="2" Background="#1E293B" CornerRadius="6" Padding="12,6">
-                    <TextBlock Text="📦 Product Management" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="13"/>
+                <!-- Navigation Tabs -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="📦 Products"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding ShowProductsCommand}"
+                            Margin="0,0,8,0"/>
+
+                    <Button Content="📊 Stock Management"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding ShowStockCommand}"
+                            Margin="0,0,8,0"/>
+
+                    <Button Content="🛒 Point of Sale (POS)"
+                            Style="{StaticResource NavButtonStyle}"
+                            Command="{Binding ShowPosCommand}"/>
+                </StackPanel>
+
+                <!-- Active Module Indicator -->
+                <Border Grid.Column="3" Background="#1E293B" CornerRadius="6" Padding="14,6">
+                    <TextBlock Text="{Binding ActiveModuleName, StringFormat='Active: {0}'}" 
+                               Foreground="#38BDF8" 
+                               FontWeight="SemiBold" 
+                               FontSize="13"/>
                 </Border>
             </Grid>
         </Border>
 
-        <!-- Main View Content -->
-        <views:ProductManagementView Grid.Row="1" DataContext="{Binding ProductManagementVM}"/>
+        <!-- Dynamic Module Content -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}"/>
     </Grid>
 </Window>
