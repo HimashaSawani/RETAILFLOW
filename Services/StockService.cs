@@ -17,8 +17,33 @@ public class StockService
         _context = context;
     }
 
+    public async Task<List<Product>> GetAllStockProductsAsync()
+    {
+        return await _context.Products
+            .AsNoTracking()
+            .OrderBy(p => p.Name)
+            .ToListAsync();
+    }
+
+    public async Task<bool> RestockProductAsync(int productId, int quantityToAdd)
+    {
+        if (quantityToAdd <= 0)
+            throw new ArgumentException("Restock quantity must be greater than zero.");
+
+        var product = await _context.Products.FindAsync(productId);
+        if (product == null)
+            return false;
+
+        product.StockQuantity += quantityToAdd;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<bool> UpdateStockQuantityAsync(int productId, int newQuantity)
     {
+        if (newQuantity < 0)
+            throw new ArgumentException("Stock quantity cannot be negative.");
+
         var product = await _context.Products.FindAsync(productId);
         if (product == null)
             return false;
@@ -28,25 +53,12 @@ public class StockService
         return true;
     }
 
-    public async Task<bool> AdjustStockAsync(int productId, int quantityDelta)
-    {
-        var product = await _context.Products.FindAsync(productId);
-        if (product == null)
-            return false;
-
-        if (product.StockQuantity + quantityDelta < 0)
-            return false;
-
-        product.StockQuantity += quantityDelta;
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
     public async Task<List<Product>> GetLowStockProductsAsync()
     {
         return await _context.Products
             .AsNoTracking()
             .Where(p => p.StockQuantity <= p.ReorderLevel)
+            .OrderBy(p => p.StockQuantity)
             .ToListAsync();
     }
 }
