@@ -136,3 +136,9 @@ d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\StockManagementView.g.cs
 d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\PosView.baml
 d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\RestockDialog.baml
 d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\StockManagementView.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\ReceiptDialog.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\ReceiptDialog.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\DashboardView.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\TransactionHistoryView.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\DashboardView.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\TransactionHistoryView.baml

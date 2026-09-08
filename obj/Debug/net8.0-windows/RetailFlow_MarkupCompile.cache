@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 d:\RETAILFLOW\App.xaml
-61204457305
+9936822195
 
-252078667717
+33-1438014303
 2161954416318
-MainWindow.xaml;Views\PosView.xaml;Views\ProductFormDialog.xaml;Views\ProductManagementView.xaml;Views\RestockDialog.xaml;Views\StockManagementView.xaml;
+MainWindow.xaml;Views\DashboardView.xaml;Views\PosView.xaml;Views\ProductFormDialog.xaml;Views\ProductManagementView.xaml;Views\ReceiptDialog.xaml;Views\RestockDialog.xaml;Views\StockManagementView.xaml;Views\TransactionHistoryView.xaml;
 
 False
 
