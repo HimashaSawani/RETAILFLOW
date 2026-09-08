@@ -125,3 +125,14 @@ d:\RETAILFLOW\obj\Debug\net8.0-windows\RetailFlow.pdb
 d:\RETAILFLOW\obj\Debug\net8.0-windows\RetailFlow.genruntimeconfig.cache
 d:\RETAILFLOW\obj\Debug\net8.0-windows\ref\RetailFlow.dll
 d:\RETAILFLOW\obj\Debug\net8.0-windows\RetailFlow.sourcelink.json
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\ProductFormDialog.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\ProductManagementView.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\ProductFormDialog.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\ProductManagementView.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\PosView.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\RestockDialog.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\StockManagementView.g.cs
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\PosView.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\RestockDialog.baml
+d:\RETAILFLOW\obj\Debug\net8.0-windows\Views\StockManagementView.baml
