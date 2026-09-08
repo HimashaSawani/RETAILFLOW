@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 using RetailFlow.ViewModels;
+using RetailFlow.Views;
 using System;
 using System.Diagnostics;
 using System.Windows;
