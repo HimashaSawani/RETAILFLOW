@@ -3,10 +3,51 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RetailFlow"
+        xmlns:views="clr-namespace:RetailFlow.Views"
+        xmlns:vm="clr-namespace:RetailFlow.ViewModels"
         mc:Ignorable="d"
-        Title="RetailFlow - Retail Management System" Height="450" Width="800">
-    <Grid>
+        Title="RetailFlow - Retail Management System" 
+        Height="700" Width="1000"
+        MinHeight="600" MinWidth="850"
+        WindowStartupLocation="CenterScreen"
+        Background="#F1F5F9"
+        FontFamily="Segoe UI">
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top App Bar / Header -->
+            <RowDefinition Height="64"/>
+            <!-- Main Content Area -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Navigation / Brand Header -->
+        <Border Grid.Row="0" Background="#0F172A" Padding="24,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Brand Logo & Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#2563EB" CornerRadius="6" Width="36" Height="36" Margin="0,0,12,0">
+                        <TextBlock Text="RF" Foreground="White" FontWeight="Bold" FontSize="16"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="RetailFlow" FontSize="20" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text=" | POS &amp; Inventory" FontSize="14" Foreground="#94A3B8" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                </StackPanel>
+
+                <!-- Module Indicator -->
+                <Border Grid.Column="2" Background="#1E293B" CornerRadius="6" Padding="12,6">
+                    <TextBlock Text="📦 Product Management" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="13"/>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Main View Content -->
+        <views:ProductManagementView Grid.Row="1" DataContext="{Binding ProductManagementVM}"/>
     </Grid>
 </Window>
