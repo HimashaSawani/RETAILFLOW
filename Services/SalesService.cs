@@ -170,6 +170,20 @@ public class SalesService
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
+    public async Task<decimal> GetTotalSalesRevenueAsync(DateTime? fromDate = null, DateTime? toDate = null)
+    {
+        var query = _context.Sales.AsQueryable();
+
+        if (fromDate.HasValue)
+            query = query.Where(s => s.SaleDate >= fromDate.Value);
+
+        if (toDate.HasValue)
+            query = query.Where(s => s.SaleDate <= toDate.Value);
+
+        var sales = await query.ToListAsync();
+        return sales.Sum(s => s.Total);
+    }
+
     public async Task<DashboardMetricsDto> GetDashboardMetricsAsync()
     {
         var today = DateTime.UtcNow.Date;
@@ -188,9 +202,14 @@ public class SalesService
         int lowStockCount = await _context.Products
             .CountAsync(p => p.StockQuantity <= p.ReorderLevel);
 
-        // Top Selling Products (Aggregated from SaleItems)
-        var topProductsRaw = await _context.SaleItems
+        // Top Selling Products (Client-side evaluation to support SQLite decimal operations)
+        var allSaleItems = await _context.SaleItems
             .Include(si => si.Product)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var topProductsRaw = allSaleItems
+            .Where(si => si.Product != null)
             .GroupBy(si => new { si.ProductId, si.Product.Name, si.Product.SKU })
             .Select(g => new TopProductDto
             {
@@ -201,7 +220,7 @@ public class SalesService
             })
             .OrderByDescending(t => t.UnitsSold)
             .Take(5)
-            .ToListAsync();
+            .ToList();
 
         // 7-day Weekly Sales for Chart
         var weekSales = new List<DailySalesDto>();
