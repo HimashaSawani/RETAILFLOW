@@ -6,46 +6,56 @@
         xmlns:views="clr-namespace:RetailFlow.Views"
         xmlns:vm="clr-namespace:RetailFlow.ViewModels"
         mc:Ignorable="d"
-        Title="RetailFlow - Retail Management System" 
-        Height="720" Width="1100"
-        MinHeight="620" MinWidth="900"
+        Title="RetailFlow - Modern Retail Management &amp; POS" 
+        Height="760" Width="1200"
+        MinHeight="650" MinWidth="980"
         WindowStartupLocation="CenterScreen"
-        Background="#F1F5F9"
+        Background="#F8FAFC"
         FontFamily="Segoe UI">
 
     <Window.Resources>
         <!-- DataTemplates for Module Views -->
-        <DataTemplate DataType="{x:Type vm:ProductManagementViewModel}">
-            <views:ProductManagementView/>
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardView/>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vm:StockManagementViewModel}">
-            <views:StockManagementView/>
+        <DataTemplate DataType="{x:Type vm:ProductManagementViewModel}">
+            <views:ProductManagementView/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:PosViewModel}">
             <views:PosView/>
         </DataTemplate>
 
-        <!-- Navigation Button Style -->
-        <Style x:Key="NavButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="40"/>
+        <DataTemplate DataType="{x:Type vm:StockManagementViewModel}">
+            <views:StockManagementView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:TransactionHistoryViewModel}">
+            <views:TransactionHistoryView/>
+        </DataTemplate>
+
+        <!-- Sidebar Navigation Button Style -->
+        <Style x:Key="SidebarBtnStyle" TargetType="Button">
+            <Setter Property="Height" Value="46"/>
             <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#94A3B8"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Style.Resources>
                 <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
+                    <Setter Property="CornerRadius" Value="8"/>
                 </Style>
             </Style.Resources>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#1E293B"/>
-                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -53,50 +63,33 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Top App Bar / Header -->
-            <RowDefinition Height="64"/>
-            <!-- Main Content Area -->
+            <!-- Top App Bar -->
+            <RowDefinition Height="60"/>
+            <!-- Content & Sidebar Area -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Top Navigation / Brand Header -->
-        <Border Grid.Row="0" Background="#0F172A" Padding="24,0">
+        <!-- Top App Bar / Brand Header -->
+        <Border Grid.Row="0" Background="#0B1120" Padding="24,0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="32"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Brand Logo & Title -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="#2563EB" CornerRadius="6" Width="36" Height="36" Margin="0,0,12,0">
+                    <Border Background="#2563EB" CornerRadius="8" Width="36" Height="36" Margin="0,0,12,0">
                         <TextBlock Text="RF" Foreground="White" FontWeight="Bold" FontSize="16"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="RetailFlow" FontSize="20" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text="RETAILFLOW" FontSize="19" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text="Retail Management &amp; POS" FontSize="13" Foreground="#64748B" VerticalAlignment="Center" Margin="10,2,0,0"/>
                 </StackPanel>
 
-                <!-- Navigation Tabs -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="📦 Products"
-                            Style="{StaticResource NavButtonStyle}"
-                            Command="{Binding ShowProductsCommand}"
-                            Margin="0,0,8,0"/>
-
-                    <Button Content="📊 Stock Management"
-                            Style="{StaticResource NavButtonStyle}"
-                            Command="{Binding ShowStockCommand}"
-                            Margin="0,0,8,0"/>
-
-                    <Button Content="🛒 Point of Sale (POS)"
-                            Style="{StaticResource NavButtonStyle}"
-                            Command="{Binding ShowPosCommand}"/>
-                </StackPanel>
-
-                <!-- Active Module Indicator -->
-                <Border Grid.Column="3" Background="#1E293B" CornerRadius="6" Padding="14,6">
+                <!-- Current Active Module Badge -->
+                <Border Grid.Column="2" Background="#1E293B" CornerRadius="6" Padding="14,6">
                     <TextBlock Text="{Binding ActiveModuleName, StringFormat='Active: {0}'}" 
                                Foreground="#38BDF8" 
                                FontWeight="SemiBold" 
@@ -105,7 +98,51 @@
             </Grid>
         </Border>
 
-        <!-- Dynamic Module Content -->
-        <ContentControl Grid.Row="1" Content="{Binding CurrentView}"/>
+        <!-- Main Body: Sidebar (Left) + Content (Right) -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Sidebar Navigation -->
+            <Border Grid.Column="0" Background="#0F172A" Padding="16,24">
+                <StackPanel>
+                    <TextBlock Text="MAIN NAVIGATION" 
+                               FontSize="11" 
+                               FontWeight="Bold" 
+                               Foreground="#475569" 
+                               Margin="12,0,0,14"/>
+
+                    <!-- Dashboard -->
+                    <Button Content="📊  Dashboard"
+                            Style="{StaticResource SidebarBtnStyle}"
+                            Command="{Binding ShowDashboardCommand}"/>
+
+                    <!-- Products -->
+                    <Button Content="📦  Products"
+                            Style="{StaticResource SidebarBtnStyle}"
+                            Command="{Binding ShowProductsCommand}"/>
+
+                    <!-- Sales / POS -->
+                    <Button Content="🛒  Sales"
+                            Style="{StaticResource SidebarBtnStyle}"
+                            Command="{Binding ShowPosCommand}"/>
+
+                    <!-- Stock Management -->
+                    <Button Content="📈  Stock"
+                            Style="{StaticResource SidebarBtnStyle}"
+                            Command="{Binding ShowStockCommand}"/>
+
+                    <!-- Transaction History -->
+                    <Button Content="📜  Transactions"
+                            Style="{StaticResource SidebarBtnStyle}"
+                            Command="{Binding ShowTransactionsCommand}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Dynamic Content Area -->
+            <ContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
+        </Grid>
     </Grid>
 </Window>
