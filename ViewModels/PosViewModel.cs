@@ -123,6 +123,7 @@ public class PosViewModel : ViewModelBase
     public ICommand CompleteSaleCommand { get; }
     public ICommand RefreshProductsCommand { get; }
 
+    public Action<SaleReceipt>? OpenReceiptDialog { get; set; }
     public Action<string, string>? ShowMessageDialog { get; set; }
 
     public PosViewModel(ProductService productService, SalesService salesService)
@@ -265,42 +266,13 @@ public class PosViewModel : ViewModelBase
             IsProcessingSale = true;
             ClearValidation();
 
-            // Validate all items against fresh stock quantities in DB
-            foreach (var item in CartItems)
-            {
-                var dbProduct = await _productService.GetProductByIdAsync(item.ProductId);
-                if (dbProduct == null)
-                {
-                    ValidationMessage = $"❌ Product '{item.ProductName}' was not found in database.";
-                    return;
-                }
+            // Prepare items for transaction
+            var cartPayload = CartItems.Select(ci => (ci.ProductId, ci.Quantity)).ToList();
 
-                if (dbProduct.StockQuantity < item.Quantity)
-                {
-                    ValidationMessage = $"❌ Insufficient Stock\nOnly {dbProduct.StockQuantity} units of '{dbProduct.Name}' are available.";
-                    return;
-                }
-            }
+            // Execute atomic database transaction (Phase 11 & Phase 12)
+            var receipt = await _salesService.ExecuteSaleTransactionAsync(cartPayload, Discount);
 
-            // Create Sale entity
-            var sale = new Sale
-            {
-                Discount = Discount,
-                SaleItems = CartItems.Select(ci => new SaleItem
-                {
-                    ProductId = ci.ProductId,
-                    Quantity = ci.Quantity,
-                    UnitPrice = ci.UnitPrice,
-                    Subtotal = ci.Total
-                }).ToList()
-            };
-
-            var processedSale = await _salesService.ProcessSaleAsync(sale);
-
-            SuccessMessage = $"✔ Sale Completed Successfully!\nTransaction #: {processedSale.TransactionNumber}\nTotal Paid: {processedSale.Total:C}";
-            ShowMessageDialog?.Invoke(
-                $"Sale completed successfully!\n\nTransaction No: {processedSale.TransactionNumber}\nTotal Items: {CartItems.Sum(c => c.Quantity)}\nTotal Amount: {processedSale.Total:N2}",
-                "Sale Success");
+            SuccessMessage = $"✔ Sale Completed Successfully!\nInvoice: #{receipt.InvoiceNumber} | Total: Rs. {receipt.Total:N2}";
 
             // Reset cart
             CartItems.Clear();
@@ -309,10 +281,15 @@ public class PosViewModel : ViewModelBase
 
             // Refresh available product stocks
             await LoadProductsAsync();
+
+            // Display Receipt Dialog
+            OpenReceiptDialog?.Invoke(receipt);
         }
         catch (Exception ex)
         {
-            ValidationMessage = $"❌ Failed to process sale: {ex.Message}";
+            // Transaction was rolled back automatically by SalesService
+            ValidationMessage = $"❌ Sale failed\n{ex.Message}\nNo stock was deducted.";
+            ShowMessageDialog?.Invoke($"Sale failed: {ex.Message}\n\nNo stock was deducted.", "Transaction Error");
         }
         finally
         {
