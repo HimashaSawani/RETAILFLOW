@@ -102,6 +102,9 @@ RetailFlow strictly adheres to the MVVM design pattern:
    - `Subtotal` (DECIMAL(18,2))
    - `Discount` (DECIMAL(18,2), Default 0)
    - `Total` (DECIMAL(18,2))
+   - `PaymentMethod` (NVARCHAR(50), Default "Cash")
+   - `AmountTendered` (DECIMAL(18,2))
+   - `ChangeDue` (DECIMAL(18,2))
 
 3. **SaleItems Table**:
    - `Id` (INT, Primary Key, Auto-Increment)
@@ -117,11 +120,12 @@ RetailFlow strictly adheres to the MVVM design pattern:
 
 ### 4.1 Product Management (Feature #1)
 - Full CRUD interface (Add, Edit, Delete, Search).
-- Live search query against SKU, Name, and Category.
+- Live keyword search across SKU, Name, and Category.
+- **Category Filter Dropdown**: Quickly isolate product categories (e.g. *Bakery, Beverages, Dairy, Snacks*).
 - Validations: Rejection of empty SKUs, empty names, negative pricing, negative inventory, and duplicate SKUs.
 
 ### 4.2 Stock Management & Restocking (Feature #2)
-- Visual indicators:
+- Visual health badges:
   - `OK` (Stock > ReorderLevel)
   - `LOW` (0 < Stock <= ReorderLevel)
   - `OUT` (Stock == 0)
