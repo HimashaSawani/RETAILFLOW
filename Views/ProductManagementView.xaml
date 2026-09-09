@@ -96,20 +96,32 @@
                    Style="{StaticResource HeaderStyle}"
                    Margin="0,0,0,20"/>
 
-        <!-- Search Bar & Add Button -->
+        <!-- Search Bar, Category Filter & Add Button -->
         <Grid Grid.Row="1" Margin="0,0,0,18">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Search by Name/SKU -->
             <TextBox Grid.Column="0"
                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource SearchTextBoxStyle}"
-                     Tag="Search by SKU, Name, or Category..."/>
+                     Style="{StaticResource SearchTextBoxStyle}"/>
 
-            <Button Grid.Column="2"
+            <!-- Category Filter Dropdown -->
+            <ComboBox Grid.Column="2"
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory}"
+                      Height="40"
+                      FontSize="14"
+                      VerticalContentAlignment="Center"
+                      ToolTip="Filter by Category"/>
+
+            <!-- Add Product Button -->
+            <Button Grid.Column="4"
                     Content="+ Add Product"
                     Style="{StaticResource AddBtnStyle}"
                     Command="{Binding AddProductCommand}"/>
