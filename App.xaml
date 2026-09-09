@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:RetailFlow"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
     </Application.Resources>
 </Application>
