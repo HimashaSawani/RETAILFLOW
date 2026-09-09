@@ -32,11 +32,16 @@ public partial class App : Application
             args.SetObserved();
         };
 
-        // Automatically ensure SQLite database and tables are created upon startup
+        // Automatically ensure SQLite database and tables are created and updated upon startup
         try
         {
             using var context = new AppDbContext();
             context.Database.EnsureCreated();
+
+            // Ensure newly added columns exist in existing SQLite databases
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN PaymentMethod TEXT DEFAULT 'Cash';"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN AmountTendered NUMERIC DEFAULT 0;"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN ChangeDue NUMERIC DEFAULT 0;"); } catch { }
         }
         catch (Exception ex)
         {

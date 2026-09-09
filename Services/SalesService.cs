@@ -28,11 +28,13 @@ public class DailySalesDto
 public class DashboardMetricsDto
 {
     public decimal TodaySales { get; set; }
+    public decimal TodayGrossProfit { get; set; }
     public int TodayTransactions { get; set; }
     public int TotalProducts { get; set; }
     public int LowStockProducts { get; set; }
     public List<TopProductDto> TopProducts { get; set; } = new();
     public List<DailySalesDto> WeeklySales { get; set; } = new();
+    public List<Product> CriticalLowStockItems { get; set; } = new();
 }
 
 public class SalesService
@@ -54,7 +56,12 @@ public class SalesService
     /// Step 6: Save everything atomically
     /// Step 7: Return comprehensive receipt
     /// </summary>
-    public async Task<SaleReceipt> ExecuteSaleTransactionAsync(List<(int ProductId, int Quantity)> cartItems, decimal discount)
+    public async Task<SaleReceipt> ExecuteSaleTransactionAsync(
+        List<(int ProductId, int Quantity)> cartItems, 
+        decimal discount, 
+        string paymentMethod = "Cash", 
+        decimal amountTendered = 0, 
+        decimal changeDue = 0)
     {
         if (cartItems == null || !cartItems.Any())
         {
@@ -76,7 +83,10 @@ public class SalesService
             {
                 TransactionNumber = invoiceNumber,
                 SaleDate = DateTime.UtcNow,
-                Discount = discount
+                Discount = discount,
+                PaymentMethod = string.IsNullOrWhiteSpace(paymentMethod) ? "Cash" : paymentMethod,
+                AmountTendered = amountTendered,
+                ChangeDue = changeDue
             };
 
             foreach (var (productId, quantity) in cartItems)
@@ -131,6 +141,12 @@ public class SalesService
             sale.Total = Math.Max(0, subtotal - discount);
             sale.SaleItems = saleItems;
 
+            if (sale.PaymentMethod != "Cash" || sale.AmountTendered <= 0)
+            {
+                sale.AmountTendered = sale.Total;
+                sale.ChangeDue = 0;
+            }
+
             _context.Sales.Add(sale);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -142,7 +158,10 @@ public class SalesService
                 Items = receiptItems,
                 Subtotal = sale.Subtotal,
                 Discount = sale.Discount,
-                Total = sale.Total
+                Total = sale.Total,
+                PaymentMethod = sale.PaymentMethod,
+                AmountTendered = sale.AmountTendered,
+                ChangeDue = sale.ChangeDue
             };
         }
         catch
@@ -191,18 +210,39 @@ public class SalesService
 
         // Today's Sales
         var todaySalesList = await _context.Sales
+            .Include(s => s.SaleItems)
+            .ThenInclude(si => si.Product)
             .Where(s => s.SaleDate >= today && s.SaleDate < tomorrow)
             .ToListAsync();
 
         decimal todaySalesTotal = todaySalesList.Sum(s => s.Total);
         int todayTransactions = todaySalesList.Count;
 
+        // Calculate Gross Profit: (SellingPrice - CostPrice) * Qty - Discounts
+        decimal totalCost = 0;
+        foreach (var sale in todaySalesList)
+        {
+            foreach (var item in sale.SaleItems)
+            {
+                decimal cost = item.Product != null ? item.Product.CostPrice : 0;
+                totalCost += cost * item.Quantity;
+            }
+        }
+        decimal todayGrossProfit = Math.Max(0, todaySalesTotal - totalCost);
+
         // Total products & low stock
         int totalProducts = await _context.Products.CountAsync();
         int lowStockCount = await _context.Products
             .CountAsync(p => p.StockQuantity <= p.ReorderLevel);
 
-        // Top Selling Products (Client-side evaluation to support SQLite decimal operations)
+        // Critical Low Stock Products (Take 5 most urgent)
+        var criticalLowStockItems = await _context.Products
+            .Where(p => p.StockQuantity <= p.ReorderLevel)
+            .OrderBy(p => p.StockQuantity)
+            .Take(5)
+            .ToListAsync();
+
+        // Top Selling Products
         var allSaleItems = await _context.SaleItems
             .Include(si => si.Product)
             .AsNoTracking()
@@ -254,9 +294,11 @@ public class SalesService
         return new DashboardMetricsDto
         {
             TodaySales = todaySalesTotal,
+            TodayGrossProfit = todayGrossProfit,
             TodayTransactions = todayTransactions,
             TotalProducts = totalProducts,
             LowStockProducts = lowStockCount,
+            CriticalLowStockItems = criticalLowStockItems,
             TopProducts = topProductsRaw,
             WeeklySales = weekSales
         };

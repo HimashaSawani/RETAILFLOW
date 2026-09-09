@@ -22,4 +22,7 @@ public class SaleReceipt
     public decimal Subtotal { get; set; }
     public decimal Discount { get; set; }
     public decimal Total { get; set; }
+    public string PaymentMethod { get; set; } = "Cash";
+    public decimal AmountTendered { get; set; }
+    public decimal ChangeDue { get; set; }
 }

@@ -25,5 +25,14 @@ public class Sale
     [Column(TypeName = "decimal(18,2)")]
     public decimal Total { get; set; }
 
+    [MaxLength(50)]
+    public string PaymentMethod { get; set; } = "Cash";
+
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal AmountTendered { get; set; }
+
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal ChangeDue { get; set; }
+
     public virtual ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
 }
