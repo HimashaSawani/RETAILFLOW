@@ -12,11 +12,13 @@ public class ProductManagementViewModel : ViewModelBase
 {
     private readonly ProductService _productService;
     private string _searchText = string.Empty;
+    private string _selectedCategory = "All Categories";
     private Product? _selectedProduct;
     private bool _isLoading;
     private string _statusMessage = string.Empty;
 
     public ObservableCollection<Product> Products { get; } = new();
+    public ObservableCollection<string> Categories { get; } = new() { "All Categories" };
 
     public string SearchText
     {
@@ -25,7 +27,19 @@ public class ProductManagementViewModel : ViewModelBase
         {
             if (SetProperty(ref _searchText, value))
             {
-                _ = SearchProductsAsync();
+                _ = FilterProductsAsync();
+            }
+        }
+    }
+
+    public string SelectedCategory
+    {
+        get => _selectedCategory;
+        set
+        {
+            if (SetProperty(ref _selectedCategory, value))
+            {
+                _ = FilterProductsAsync();
             }
         }
     }
@@ -63,7 +77,7 @@ public class ProductManagementViewModel : ViewModelBase
     {
         _productService = productService;
 
-        SearchCommand = new RelayCommand(async () => await SearchProductsAsync());
+        SearchCommand = new RelayCommand(async () => await FilterProductsAsync());
         RefreshCommand = new RelayCommand(async () => await LoadProductsAsync());
         AddProductCommand = new RelayCommand(async () => await ExecuteAddProductAsync());
         EditProductCommand = new RelayCommand(async () => await ExecuteEditProductAsync(), () => SelectedProduct != null);
@@ -78,13 +92,35 @@ public class ProductManagementViewModel : ViewModelBase
             StatusMessage = "Loading products...";
 
             var list = await _productService.GetAllProductsAsync();
-            Products.Clear();
-            foreach (var item in list)
+            
+            // Populate distinct categories
+            var currentSelectedCat = SelectedCategory;
+            var distinctCats = list
+                .Select(p => p.Category)
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(c => c)
+                .ToList();
+
+            Categories.Clear();
+            Categories.Add("All Categories");
+            foreach (var cat in distinctCats)
             {
-                Products.Add(item);
+                Categories.Add(cat);
             }
 
-            StatusMessage = $"{Products.Count} product(s) loaded.";
+            if (Categories.Contains(currentSelectedCat))
+            {
+                _selectedCategory = currentSelectedCat;
+                OnPropertyChanged(nameof(SelectedCategory));
+            }
+            else
+            {
+                _selectedCategory = "All Categories";
+                OnPropertyChanged(nameof(SelectedCategory));
+            }
+
+            await FilterProductsAsync();
         }
         catch (Exception ex)
         {
@@ -96,22 +132,42 @@ public class ProductManagementViewModel : ViewModelBase
         }
     }
 
-    public async Task SearchProductsAsync()
+    public async Task FilterProductsAsync()
     {
         try
         {
             IsLoading = true;
-            var list = await _productService.SearchProductsAsync(SearchText);
+            var list = await _productService.GetAllProductsAsync();
+
+            var filtered = list.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                string query = SearchText.Trim().ToLower();
+                filtered = filtered.Where(p => 
+                    p.Name.ToLower().Contains(query) || 
+                    p.SKU.ToLower().Contains(query) || 
+                    p.Category.ToLower().Contains(query));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedCategory) && SelectedCategory != "All Categories")
+            {
+                filtered = filtered.Where(p => string.Equals(p.Category, SelectedCategory, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var result = filtered.ToList();
+
             Products.Clear();
-            foreach (var item in list)
+            foreach (var item in result)
             {
                 Products.Add(item);
             }
-            StatusMessage = $"Found {Products.Count} matching product(s).";
+
+            StatusMessage = $"{Products.Count} product(s) displayed.";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Search error: {ex.Message}";
+            StatusMessage = $"Filter error: {ex.Message}";
         }
         finally
         {

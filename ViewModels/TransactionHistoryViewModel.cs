@@ -22,6 +22,9 @@ public class TransactionDisplayModel : ViewModelBase
     public decimal Subtotal => Sale.Subtotal;
     public decimal Discount => Sale.Discount;
     public decimal Total => Sale.Total;
+    public string PaymentMethod => string.IsNullOrWhiteSpace(Sale.PaymentMethod) ? "Cash" : Sale.PaymentMethod;
+    public decimal AmountTendered => Sale.AmountTendered > 0 ? Sale.AmountTendered : Sale.Total;
+    public decimal ChangeDue => Sale.ChangeDue;
     public ICollection<SaleItem> SaleItems => Sale.SaleItems;
 
     public TransactionDisplayModel(Sale sale)
@@ -34,11 +37,13 @@ public class TransactionHistoryViewModel : ViewModelBase
 {
     private readonly SalesService _salesService;
     private string _searchText = string.Empty;
+    private string _selectedDateFilter = "All Time";
     private TransactionDisplayModel? _selectedTransaction;
     private bool _isLoading;
     private string _statusMessage = string.Empty;
 
     public ObservableCollection<TransactionDisplayModel> Transactions { get; } = new();
+    public ObservableCollection<string> DateFilters { get; } = new() { "All Time", "Today", "This Week" };
 
     public string SearchText
     {
@@ -46,6 +51,18 @@ public class TransactionHistoryViewModel : ViewModelBase
         set
         {
             if (SetProperty(ref _searchText, value))
+            {
+                _ = FilterTransactionsAsync();
+            }
+        }
+    }
+
+    public string SelectedDateFilter
+    {
+        get => _selectedDateFilter;
+        set
+        {
+            if (SetProperty(ref _selectedDateFilter, value))
             {
                 _ = FilterTransactionsAsync();
             }
@@ -95,20 +112,7 @@ public class TransactionHistoryViewModel : ViewModelBase
             IsLoading = true;
             StatusMessage = "Loading transaction history...";
 
-            var list = await _salesService.GetAllSalesAsync();
-            Transactions.Clear();
-            foreach (var sale in list)
-            {
-                Transactions.Add(new TransactionDisplayModel(sale));
-            }
-
-            if (Transactions.Any() && SelectedTransaction == null)
-            {
-                SelectedTransaction = Transactions.First();
-            }
-
-            OnPropertyChanged(nameof(HasNoTransactions));
-            StatusMessage = $"{Transactions.Count} transaction(s) found.";
+            await FilterTransactionsAsync();
         }
         catch (Exception ex)
         {
@@ -127,12 +131,25 @@ public class TransactionHistoryViewModel : ViewModelBase
         {
             var list = await _salesService.GetAllSalesAsync();
 
+            // Apply Date Filter
+            var today = DateTime.UtcNow.Date;
+            if (SelectedDateFilter == "Today")
+            {
+                list = list.Where(s => s.SaleDate >= today && s.SaleDate < today.AddDays(1)).ToList();
+            }
+            else if (SelectedDateFilter == "This Week")
+            {
+                var startOfWeek = today.AddDays(-7);
+                list = list.Where(s => s.SaleDate >= startOfWeek).ToList();
+            }
+
+            // Apply Search Query
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 string query = SearchText.Trim().ToLower();
                 list = list.Where(s => s.TransactionNumber.ToLower().Contains(query) ||
                                        s.SaleDate.ToString().ToLower().Contains(query) ||
-                                       s.SaleItems.Any(si => si.Product.Name.ToLower().Contains(query))).ToList();
+                                       s.SaleItems.Any(si => si.Product != null && si.Product.Name.ToLower().Contains(query))).ToList();
             }
 
             Transactions.Clear();
@@ -143,6 +160,7 @@ public class TransactionHistoryViewModel : ViewModelBase
 
             SelectedTransaction = Transactions.FirstOrDefault();
             OnPropertyChanged(nameof(HasNoTransactions));
+            StatusMessage = $"{Transactions.Count} transaction(s) displayed.";
         }
         catch (Exception ex)
         {
