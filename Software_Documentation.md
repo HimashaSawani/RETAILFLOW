@@ -1,60 +1,85 @@
-# RetailFlow — Comprehensive Software Documentation
+# RetailFlow — Software Documentation
 
-**Project Name:** RetailFlow  
-**Version:** 1.0.0  
+**Project Name:** RetailFlow — Retail Inventory & POS Desktop Application  
 **Target Platform:** Windows (.NET 8.0 WPF)  
-**Database Engine:** SQLite (`retailflow.db`) with Entity Framework Core 8  
+**Database:** SQLite (`retailflow.db`) with Entity Framework Core 8  
 **Architecture:** Model-View-ViewModel (MVVM)  
+**Author:** Software Engineering Intern Technical Assignment (Hayleys Aventura)  
 
 ---
 
-## 1. Executive Summary
+## 1. Application Overview & Main Features
 
-**RetailFlow** is a modern desktop Retail Management and Point of Sale (POS) system engineered for high performance, ease of use, data consistency, and architectural maintainability.
+**RetailFlow** is a modern, lightweight, and robust desktop Retail Management and Point of Sale (POS) system built using .NET 8 WPF. It provides retail store operators and cashiers with an intuitive solution to manage products, maintain live stock, process sales transactions with instant cash tender/change calculations, inspect transaction history, and monitor business health via an executive dashboard.
 
-The application allows retail operators to manage products, monitor live inventory with visual alert badges, execute restock orders, perform rapid sales checkout with strict stock validation and ACID database transactions, review historical itemized receipts, and analyze real-time sales trends via an interactive dashboard.
+### Main Features:
+1. **Product Management (Feature #1)**:
+   - Full CRUD (Create, Read, Update, Delete) product management.
+   - Real-time search by Product Name, SKU, or Category.
+   - **Category Filter Dropdown** to instantly view specific product groups.
+   - Strict field validations (unique SKU check, non-empty names, positive pricing, non-negative inventory).
 
----
+2. **Sales Screen / Point of Sale (Feature #2)**:
+   - Fast product lookup with unit prices and real-time available stock count.
+   - Interactive cart with quantity adjustments, single-click row deletion (`✕`), and custom discounts.
+   - **Payment Method Selection**: Cash, Card, QR / Bank Transfer.
+   - **Cash Tender & Change Due**: Live change calculation (`Tendered - Total`), quick cash presets (`Exact`, `+50`, `+100`, `+500`, `+1000`, `+5000`), and under-payment prevention.
+   - Real-time stock validation preventing sales exceeding available physical inventory.
 
-## 2. System Architecture & Design Pattern
+3. **Stock Management (Feature #3)**:
+   - Visual stock health badges:
+     - 🟢 `IN STOCK` (Stock > Reorder Level)
+     - 🟡 `LOW STOCK` (0 < Stock $\le$ Reorder Level)
+     - 🔴 `OUT OF STOCK` (Stock = 0)
+   - 1-Click **Quick Restock Modal** with live calculated new stock.
+   - Automatic real-time stock deduction upon checkout.
 
-### 2.1 MVVM (Model-View-ViewModel) Pattern
-RetailFlow strictly adheres to the MVVM design pattern:
+4. **Transaction History (Feature #4)**:
+   - Searchable list of all completed sales with invoice numbers (`INV-0001`, `INV-0002`, etc.).
+   - **Date Filter**: Quick filter by *All Time, Today, This Week*.
+   - Itemized slide-out drawer showing complete receipt breakdown, payment method, amount paid, and change returned.
 
-```
-┌────────────────────────────────────────────────────────┐
-│                        VIEW                            │
-│  (MainWindow, DashboardView, ProductManagementView,    │
-│   StockManagementView, PosView, TransactionHistoryView)│
-└───────────────────────────▲────────────────────────────┘
-                            │ Data Binding & Commands
-┌───────────────────────────▼────────────────────────────┐
-│                      VIEWMODEL                         │
-│  (MainViewModel, DashboardVM, ProductManagementVM,     │
-│   StockManagementVM, PosVM, TransactionHistoryVM)      │
-└───────────────────────────▲────────────────────────────┘
-                            │ Method Invocations
-┌───────────────────────────▼────────────────────────────┐
-│                      SERVICES                          │
-│  (ProductService, StockService, SalesService)          │
-└───────────────────────────▲────────────────────────────┘
-                            │ Entity Framework Core 8
-┌───────────────────────────▼────────────────────────────┐
-│                    DATA & MODELS                       │
-│  (AppDbContext, Product, Sale, SaleItem, SQLite DB)    │
-└────────────────────────────────────────────────────────┘
-```
-
-- **Separation of Concerns**: Views contain zero business logic and only define layout and UI styling.
-- **Data Binding**: Two-way data binding and `INotifyPropertyChanged` in `ViewModelBase` ensure instant synchronization between UI and data models.
-- **Testability**: Services and ViewModels can be tested independently of the UI layer.
+5. **Additional Features (Feature #5)**:
+   - **Real-Time Executive Analytics Dashboard**: KPI cards (*Today's Revenue, Gross Profit, Total Transactions, Product Count, Low Stock Alerts*), 5 most critical low-stock items table, best-sellers ranking, and a 7-day sales bar chart.
+   - **Print / PDF Receipt Generator**: Modal receipt with native Windows `PrintDialog` and formatted text file export (`Receipt_INV-XXXX.txt`).
 
 ---
 
-## 3. Database Design & Entity Relationships
+## 2. Technologies Used & Reasons for Choices
 
-### 3.1 Entity Relationship Diagram (ERD)
+| Technology | Role | Reason for Choice |
+| :--- | :--- | :--- |
+| **.NET 8.0 & C#** | Core Framework & Logic | Modern, high-performance, strongly typed runtime with long-term support (LTS). |
+| **WPF (Windows Presentation Foundation)** | Desktop UI Framework | Industry-standard for Windows desktop applications. Offers powerful data binding, XAML styling, and clean MVVM decoupling over older WinForms. |
+| **SQLite (`Microsoft.EntityFrameworkCore.Sqlite`)** | Embedded Relational Database | Lightweight, serverless, self-contained single-file database. Requires **zero installation** for reviewers—the app creates and runs the database automatically. |
+| **Entity Framework Core 8** | ORM / Data Access | Provides type-safe LINQ queries, automatic schema management, and ACID transaction support (`BeginTransactionAsync()`). |
+| **MVVM Pattern** | Software Architecture | Strict separation of Concerns: Views (XAML) $\leftrightarrow$ ViewModels (State/Commands) $\leftrightarrow$ Services (Business Logic) $\leftrightarrow$ Data (EF Core). |
 
+---
+
+## 3. How to Set Up & Run the Application
+
+### Prerequisites:
+- Windows 10 or Windows 11 PC
+- [.NET 8.0 SDK / Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Visual Studio 2022 (with *.NET desktop development* workload) or VS Code
+
+### Steps to Run:
+1. **Extract ZIP File**: Extract `FirstName_LastName_RetailAssignment.zip` to a folder.
+2. **Open the Solution**:
+   - Double-click `RetailFlow.sln` in Visual Studio 2022 and press **F5** (or `Ctrl + F5`).
+3. **Or Run via Command Line (PowerShell / Terminal)**:
+   ```powershell
+   cd d:\RETAILFLOW
+   dotnet run
+   ```
+4. **Zero Configuration Needed**: The application automatically creates `retailflow.db` and seeds 20 realistic sample products on first launch.
+
+---
+
+## 4. Database Structure & Entity Relationships
+
+### 4.1 Entity Relationship Diagram (ERD)
 ```
 ┌──────────────────────────┐             ┌──────────────────────────┐
 │         Products         │             │          Sales           │
@@ -65,11 +90,11 @@ RetailFlow strictly adheres to the MVVM design pattern:
 │     Category (string)    │             │     Subtotal (decimal)   │
 │     CostPrice (decimal)  │             │     Discount (decimal)   │
 │     SellingPrice(decimal)│             │     Total (decimal)      │
-│     StockQuantity (int)  │             └────────────┬─────────────┘
-│     ReorderLevel (int)   │                          │ 1
-│     CreatedAt (DateTime) │                          │
-└────────────┬─────────────┘                          │
-             │ 1                                      │
+│     StockQuantity (int)  │             │     PaymentMethod (str)  │
+│     ReorderLevel (int)   │             │     AmountTendered (dec) │
+│     CreatedAt (DateTime) │             │     ChangeDue (decimal)  │
+└────────────┬─────────────┘             └────────────┬─────────────┘
+             │ 1                                      │ 1
              │                                        │
              │           ┌──────────────────────┐     │
              │           │      SaleItems       │     │
@@ -83,114 +108,58 @@ RetailFlow strictly adheres to the MVVM design pattern:
                          └──────────────────────┘
 ```
 
-### 3.2 Tables & Column Specifications
-1. **Products Table**:
-   - `Id` (INT, Primary Key, Auto-Increment)
-   - `SKU` (NVARCHAR(50), Required, Unique)
-   - `Name` (NVARCHAR(100), Required)
-   - `Category` (NVARCHAR(50))
-   - `CostPrice` (DECIMAL(18,2))
-   - `SellingPrice` (DECIMAL(18,2))
-   - `StockQuantity` (INT)
-   - `ReorderLevel` (INT, Default 5)
-   - `CreatedAt` (DATETIME, UTC)
-
-2. **Sales Table**:
-   - `Id` (INT, Primary Key, Auto-Increment)
-   - `TransactionNumber` (NVARCHAR(50), Required, Sequential e.g., `INV-0001`)
-   - `SaleDate` (DATETIME, UTC)
-   - `Subtotal` (DECIMAL(18,2))
-   - `Discount` (DECIMAL(18,2), Default 0)
-   - `Total` (DECIMAL(18,2))
-   - `PaymentMethod` (NVARCHAR(50), Default "Cash")
-   - `AmountTendered` (DECIMAL(18,2))
-   - `ChangeDue` (DECIMAL(18,2))
-
-3. **SaleItems Table**:
-   - `Id` (INT, Primary Key, Auto-Increment)
-   - `SaleId` (INT, Foreign Key -> `Sales.Id`, ON DELETE CASCADE)
-   - `ProductId` (INT, Foreign Key -> `Products.Id`, ON DELETE RESTRICT)
-   - `Quantity` (INT)
-   - `UnitPrice` (DECIMAL(18,2))
-   - `Subtotal` (DECIMAL(18,2))
+### 4.2 Tables Description
+- **`Products`**: Stores product master data (`SKU`, `Name`, `Category`, `CostPrice`, `SellingPrice`, `StockQuantity`, `ReorderLevel`).
+- **`Sales`**: Stores invoice header data (`TransactionNumber`, `SaleDate`, `Subtotal`, `Discount`, `Total`, `PaymentMethod`, `AmountTendered`, `ChangeDue`).
+- **`SaleItems`**: Stores itemized line records linked to `Sales` (Cascade Delete) and `Products` (Restrict Delete).
 
 ---
 
-## 4. Key Functional Modules
+## 5. Explanation of the Selected Additional Feature
 
-### 4.1 Product Management (Feature #1)
-- Full CRUD interface (Add, Edit, Delete, Search).
-- Live keyword search across SKU, Name, and Category.
-- **Category Filter Dropdown**: Quickly isolate product categories (e.g. *Bakery, Beverages, Dairy, Snacks*).
-- Validations: Rejection of empty SKUs, empty names, negative pricing, negative inventory, and duplicate SKUs.
+### Feature: Executive Analytics Dashboard & Print Receipt
 
-### 4.2 Stock Management & Restocking (Feature #2)
-- Visual health badges:
-  - `OK` (Stock > ReorderLevel)
-  - `LOW` (0 < Stock <= ReorderLevel)
-  - `OUT` (Stock == 0)
-- Restock modal with live calculation of updated stock (`CurrentStock + QuantityToAdd`).
+#### Why It Was Selected:
+In real-world retail operations, store managers need immediate business visibility (revenue velocity, gross profit, inventory risk) without manually tallying sales receipts or opening spreadsheets. Additionally, completing a sale without a physical or digital receipt undermines customer trust.
 
-### 4.3 Point of Sale (POS) (Feature #3)
-- Product lookup with unit prices and live available stock count.
-- Cart with line totals, custom discount adjustment, and instant Total recalculation.
-
-### 4.4 Stock Validation During Sale (Phase 10)
-- Real-time stock validation at both cart addition and final checkout.
-- If quantity requested exceeds stock: displays `❌ Insufficient Stock: Only X units available` and prohibits checkout.
-
-### 4.5 Atomic Sales Database Transactions (Phase 11 & 12)
-- Uses Entity Framework Core's `BeginTransactionAsync()`.
-- Guarantees atomicity:
-  1. Validate Cart
-  2. Verify Real-time Stock
-  3. Create `Sale` and generate `INV-XXXX`
-  4. Create `SaleItems`
-  5. Deduct `Product.StockQuantity`
-  6. Commit transaction
-- If any operation fails, `RollbackAsync()` is executed and zero stock is deducted.
-
-### 4.6 Transaction History (Feature #4)
-- Displays all past sales with date/time, item counts, and totals.
-- Selecting any row renders the complete receipt breakdown in the side panel.
-
-### 4.7 Sales Dashboard (Feature #5 - Additional Feature)
-- KPI Cards: Today's Revenue, Transaction Count, Product Count, and Low Stock Alerts.
-- Best-Selling Products table sorted by units sold.
-- 7-Day sales volume bar chart.
+#### How It Improves the Application:
+1. **Gross Profit Visibility**: Tracks `Revenue - Cost of Goods Sold` in real-time, giving store owners a clear picture of true earnings.
+2. **Stockout Prevention**: Features an **Urgent Low-Stock Items** table directly on the home screen to facilitate timely reordering.
+3. **Weekly Sales Forecasting**: A 7-day sales trend visualizer monitors sales velocity day-by-day.
+4. **Receipt Validation**: The **Print / PDF Receipt** dialog validates transactions with instant printing or disk backup.
 
 ---
 
-## 5. Error Handling & Reliability Strategy
+## 6. Assumptions, Limitations & Future Improvements
 
-1. **Global Unhandled Exception Handlers**: In `App.xaml.cs` for `DispatcherUnhandledException`, `AppDomain.CurrentDomain.UnhandledException`, and `TaskScheduler.UnobservedTaskException`.
-2. **Never-Crash Principle**: User operations always present friendly error dialogues rather than crashing the process.
-3. **Database Fault Tolerance**: Database connection and creation errors are caught gracefully on startup.
+### Assumptions Made:
+- The currency unit is Sri Lankan Rupees (`Rs.`).
+- Cashiers operate on a single terminal during a shift.
+- SQLite is local to the device for maximum speed and simplicity.
+
+### Current Limitations:
+- Single-user terminal without role-based access control (Admin vs. Cashier login).
+- Standalone local database without cloud synchronization.
+
+### Improvements with More Time:
+1. **Role-Based Authentication**: Cashier mode (POS only) vs. Store Manager mode (Full access + Inventory).
+2. **Hardware Integration**: Direct connection to thermal ESC/POS receipt printers and barcode barcode scanners.
+3. **Customer Loyalty**: Customer phone lookup to accumulate purchase points and discounts.
+4. **Barcode Printing**: Generate and print SKU barcode label stickers for products.
 
 ---
 
-## 6. Test Suite & Verification Results
+## 7. Verification Test Summary
 
-All 19 verification test scenarios executed with **100% pass rate**:
-
-| # | Test Scenario | Category | Expected Result | Status |
-|---|---|---|---|---|
-| 1 | Add product | Products | Insert product with ID > 0 | **PASS** ☑ |
-| 2 | Edit product | Products | Update price/stock | **PASS** ☑ |
-| 3 | Search product | Products | Filter products by keyword | **PASS** ☑ |
-| 4 | Duplicate SKU validation | Products | Block duplicate SKU | **PASS** ☑ |
-| 5 | Invalid price validation | Products | Reject negative prices | **PASS** ☑ |
-| 6 | Delete product | Products | Delete product from database | **PASS** ☑ |
-| 7 | Add product to cart | Sales / POS | Line item added to cart | **PASS** ☑ |
-| 8 | Change quantity | Sales / POS | Correct quantity in cart | **PASS** ☑ |
-| 9 | Calculate total | Sales / POS | Total matches Subtotal - Discount | **PASS** ☑ |
-| 10 | Prevent insufficient stock | Sales / POS | Prohibit adding > available stock | **PASS** ☑ |
-| 11 | Complete sale | Sales / POS | Generates `INV-XXXX` receipt | **PASS** ☑ |
-| 12 | Stock decreases | Sales / POS | Stock reduced accurately | **PASS** ☑ |
-| 13 | Transaction appears | History | Sale stored in database | **PASS** ☑ |
-| 14 | Transaction details work | History | Line items retrieved | **PASS** ☑ |
-| 15 | Correct total | History | Total matches invoice | **PASS** ☑ |
-| 16 | Correct date/time | History | UTC timestamp recorded | **PASS** ☑ |
-| 17 | Sales total correct | Dashboard | Aggregates daily sales | **PASS** ☑ |
-| 18 | Transaction count correct | Dashboard | Counts daily sales | **PASS** ☑ |
-| 19 | Low stock count correct | Dashboard | Counts items <= reorder level | **PASS** ☑ |
+| # | Test Case | Category | Status |
+|---|---|---|:---:|
+| 1 | Product CRUD & Search | Products | **PASS** ☑ |
+| 2 | Unique SKU & Positive Price Validation | Products | **PASS** ☑ |
+| 3 | Category Filtering | Products | **PASS** ☑ |
+| 4 | Real-time Stock Check (Prevents Overselling) | POS | **PASS** ☑ |
+| 5 | Cash Tender & Change Due Calculation | POS | **PASS** ☑ |
+| 6 | Digital Payment (Card / QR) Exact Settlement | POS | **PASS** ☑ |
+| 7 | Atomic Stock Deduction (Rollback on Error) | Sales Service | **PASS** ☑ |
+| 8 | Printable Receipt Generation & Export | POS / Receipt | **PASS** ☑ |
+| 9 | Transaction History & Date Range Filtering | History | **PASS** ☑ |
+| 10 | Dashboard KPIs, Gross Profit & 7-Day Chart | Analytics | **PASS** ☑ |
