@@ -7,13 +7,15 @@
         xmlns:vm="clr-namespace:RetailFlow.ViewModels"
         mc:Ignorable="d"
         Title="RetailFlow - Modern Retail Management &amp; POS" 
-        Height="760" Width="1200"
-        MinHeight="650" MinWidth="980"
+        Height="780" Width="1240"
+        MinHeight="680" MinWidth="1020"
         WindowStartupLocation="CenterScreen"
         Background="#F8FAFC"
         FontFamily="Segoe UI">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
         <!-- DataTemplates for Module Views -->
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView/>
@@ -35,10 +37,33 @@
             <views:TransactionHistoryView/>
         </DataTemplate>
 
+        <!-- Top Bar Action Button Style -->
+        <Style x:Key="TopBarBtnStyle" TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="#F1F5F9"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#334155"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- Sidebar Navigation Button Style -->
         <Style x:Key="SidebarBtnStyle" TargetType="Button">
-            <Setter Property="Height" Value="46"/>
-            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="16,0"/>
             <Setter Property="Margin" Value="0,0,0,6"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#94A3B8"/>
@@ -64,13 +89,13 @@
     <Grid>
         <Grid.RowDefinitions>
             <!-- Top App Bar -->
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="64"/>
             <!-- Content & Sidebar Area -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Top App Bar / Brand Header -->
-        <Border Grid.Row="0" Background="#0B1120" Padding="24,0">
+        <Border Grid.Row="0" Background="#0B1120" Padding="20,0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -88,57 +113,136 @@
                     <TextBlock Text="Retail Management &amp; POS" FontSize="13" Foreground="#64748B" VerticalAlignment="Center" Margin="10,2,0,0"/>
                 </StackPanel>
 
-                <!-- Current Active Module Badge -->
-                <Border Grid.Column="2" Background="#1E293B" CornerRadius="6" Padding="14,6">
-                    <TextBlock Text="{Binding ActiveModuleName, StringFormat='Active: {0}'}" 
-                               Foreground="#38BDF8" 
-                               FontWeight="SemiBold" 
-                               FontSize="13"/>
-                </Border>
+                <!-- Center: Active Module Badge -->
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Border Background="#1E293B" CornerRadius="6" Padding="14,6">
+                        <TextBlock Text="{Binding ActiveModuleName, StringFormat='Active: {0}'}" 
+                                   Foreground="#38BDF8" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="13"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Right: Hardware, Role Badge, Switch User -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Hardware Integration Button -->
+                    <Button Content="⚙️ Hardware"
+                            Style="{StaticResource TopBarBtnStyle}"
+                            Margin="0,0,10,0"
+                            Command="{Binding OpenHardwareSettingsCommand}"
+                            ToolTip="Configure ESC/POS thermal printer, cash drawer, and barcode scanner"/>
+
+                    <!-- User & Role Badge -->
+                    <Border Background="#1E293B" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="6" Padding="12,6" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👤 " FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding UserRoleText}"
+                                       Foreground="#F8FAFC"
+                                       FontWeight="Bold"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Switch User / Lock Button -->
+                    <Button Content="🔒 Switch / Lock"
+                            Style="{StaticResource TopBarBtnStyle}"
+                            Background="#2563EB"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Command="{Binding SwitchUserCommand}"
+                            ToolTip="Switch between Cashier and Store Manager"/>
+                </StackPanel>
             </Grid>
         </Border>
 
         <!-- Main Body: Sidebar (Left) + Content (Right) -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="230"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar Navigation -->
-            <Border Grid.Column="0" Background="#0F172A" Padding="16,24">
-                <StackPanel>
-                    <TextBlock Text="MAIN NAVIGATION" 
+            <Border Grid.Column="0" Background="#0F172A" Padding="16,20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Navigation Title -->
+                    <TextBlock Grid.Row="0"
+                               Text="MAIN NAVIGATION" 
                                FontSize="11" 
                                FontWeight="Bold" 
                                Foreground="#475569" 
-                               Margin="12,0,0,14"/>
+                               Margin="10,0,0,14"/>
 
-                    <!-- Dashboard -->
-                    <Button Content="📊  Dashboard"
-                            Style="{StaticResource SidebarBtnStyle}"
-                            Command="{Binding ShowDashboardCommand}"/>
+                    <!-- Nav Buttons -->
+                    <StackPanel Grid.Row="1">
+                        <!-- Sales / POS (Always accessible) -->
+                        <Button Content="🛒  Sales (POS)"
+                                Style="{StaticResource SidebarBtnStyle}"
+                                Background="#1E293B"
+                                Foreground="#38BDF8"
+                                FontWeight="Bold"
+                                Command="{Binding ShowPosCommand}"/>
 
-                    <!-- Products -->
-                    <Button Content="📦  Products"
-                            Style="{StaticResource SidebarBtnStyle}"
-                            Command="{Binding ShowProductsCommand}"/>
+                        <!-- Transaction History (Accessible to Cashier & Manager) -->
+                        <Button Content="📜  Transactions"
+                                Style="{StaticResource SidebarBtnStyle}"
+                                Command="{Binding ShowTransactionsCommand}"/>
 
-                    <!-- Sales / POS -->
-                    <Button Content="🛒  Sales"
-                            Style="{StaticResource SidebarBtnStyle}"
-                            Command="{Binding ShowPosCommand}"/>
+                        <!-- Divider for Manager Section -->
+                        <Border Height="1" Background="#1E293B" Margin="8,10,8,12"/>
+                        <TextBlock Text="ADMIN &amp; INVENTORY (MANAGER)" 
+                                   FontSize="10" 
+                                   FontWeight="Bold" 
+                                   Foreground="#475569" 
+                                   Margin="10,0,0,10"/>
 
-                    <!-- Stock Management -->
-                    <Button Content="📈  Stock"
-                            Style="{StaticResource SidebarBtnStyle}"
-                            Command="{Binding ShowStockCommand}"/>
+                        <!-- Dashboard (Manager Only) -->
+                        <Button Style="{StaticResource SidebarBtnStyle}" Command="{Binding ShowDashboardCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📊  Dashboard"/>
+                                <TextBlock Text=" 🔒" Foreground="#EF4444" FontSize="11" Margin="4,0,0,0"
+                                           Visibility="{Binding IsCashier, Converter={StaticResource BoolToVis}}"/>
+                            </StackPanel>
+                        </Button>
 
-                    <!-- Transaction History -->
-                    <Button Content="📜  Transactions"
-                            Style="{StaticResource SidebarBtnStyle}"
-                            Command="{Binding ShowTransactionsCommand}"/>
-                </StackPanel>
+                        <!-- Products (Manager Only) -->
+                        <Button Style="{StaticResource SidebarBtnStyle}" Command="{Binding ShowProductsCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📦  Products"/>
+                                <TextBlock Text=" 🔒" Foreground="#EF4444" FontSize="11" Margin="4,0,0,0"
+                                           Visibility="{Binding IsCashier, Converter={StaticResource BoolToVis}}"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Stock Management (Manager Only) -->
+                        <Button Style="{StaticResource SidebarBtnStyle}" Command="{Binding ShowStockCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📈  Stock Inventory"/>
+                                <TextBlock Text=" 🔒" Foreground="#EF4444" FontSize="11" Margin="4,0,0,0"
+                                           Visibility="{Binding IsCashier, Converter={StaticResource BoolToVis}}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- System Status Pill -->
+                    <Border Grid.Row="2" Background="#1E293B" CornerRadius="8" Padding="12,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Width="8" Height="8" Fill="#10B981" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="RetailFlow • System Ready" FontSize="11" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Border>
 
             <!-- Dynamic Content Area -->
