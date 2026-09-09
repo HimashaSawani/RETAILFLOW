@@ -1,22 +1,79 @@
-## Build and Output Folders
+## ==========================================================
+## Standard .NET / C# / WPF .gitignore for RetailFlow
+## Prevents sensitive, binary, and temporary runtime files
+## ==========================================================
+
+# Build & Compilation Outputs
 [Bb]in/
 [Oo]bj/
 [Oo]ut/
+build/
+dist/
+artifacts/
 
-## Visual Studio / VS Code / JetBrains Rider
+# Visual Studio / Visual Studio Code / IDEs
 .vs/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 .idea/
 *.user
 *.userosscache
 *.suo
 *.userprefs
+*.sln.docstates
+*.VisualState.xml
 
-## SQLite Databases generated at runtime
+# SQLite Databases & Local Storage (Generated at runtime)
 *.db
 *.db-shm
 *.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+retailflow.db
+retailflow.db-shm
+retailflow.db-wal
 
-## Logs / Temp
+# Generated Receipts, Invoices & Export Files
+Receipt_*.html
+Receipt_*.txt
+Receipt_*.pdf
+Invoice_*.html
+Invoice_*.txt
+Invoice_*.pdf
 *.log
-[Tt]emp/
+test_*.html
+test_*.pdf
+
+# Windows OS Generated Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# macOS & Linux OS Metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# User Secrets & Environment Configs
+.env
+.env.*
+*.env
+appsettings.Development.json
+appsettings.local.json
+secrets.json
+
+# Crash Dumps & Profiling
+*.dmp
+*.mdmp
+*.crash
+*.stackdump
