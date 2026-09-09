@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="ESC/POS Thermal Receipt Simulator"
-        Height="650" Width="440"
+        Height="680" Width="490"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         Background="#0F172A"
         FontFamily="Segoe UI">
 
@@ -37,12 +37,12 @@
         </Grid>
 
         <!-- Realistic Thermal Paper Receipt Card -->
-        <Border Grid.Row="1" Background="White" CornerRadius="6" Padding="16" Margin="0,0,0,14">
+        <Border Grid.Row="1" Background="White" CornerRadius="6" Padding="18" Margin="0,0,0,14">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.4" Color="#000000"/>
             </Border.Effect>
-            <ScrollViewer x:Name="TicketScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel>
+            <ScrollViewer x:Name="TicketScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <StackPanel HorizontalAlignment="Center">
                     <!-- Paper Top Jagged Notch Visual -->
                     <Border BorderBrush="#CBD5E1" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,10">
                         <TextBlock Text="· · · ✂ · · · 80mm THERMAL RECEIPT · · · ✂ · · ·"
@@ -55,8 +55,8 @@
                     <!-- Exact Monospaced Ticket Content -->
                     <TextBlock x:Name="TicketContentText"
                                FontFamily="Consolas, 'Courier New', monospace"
-                               FontSize="12.5"
-                               LineHeight="18"
+                               FontSize="11.5"
+                               LineHeight="17"
                                Foreground="#0F172A"
                                TextWrapping="NoWrap"
                                HorizontalAlignment="Center"/>
@@ -66,34 +66,83 @@
 
         <!-- Bottom Actions -->
         <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
                        x:Name="PrinterStatusText"
                        Text="Printed to Virtual ESC/POS Simulator."
                        Foreground="#94A3B8"
                        FontSize="11"
                        VerticalAlignment="Center"/>
-            <Button Grid.Column="1"
-                    Content="Done / Close"
-                    Width="110"
-                    Height="36"
-                    Background="#2563EB"
-                    Foreground="White"
-                    FontWeight="Bold"
-                    FontSize="12"
-                    Cursor="Hand"
-                    BorderThickness="0"
-                    Click="Close_Click"
-                    IsDefault="True">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="6"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Content="🖨️ Print / PDF"
+                        Height="36"
+                        Background="#0F766E"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="11"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        ToolTip="Send to Windows printer or Microsoft Print to PDF"
+                        Click="Print_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Grid.Column="2"
+                        Content="📄 Save as PDF"
+                        Height="36"
+                        Background="#2563EB"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="11"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        ToolTip="Open formatted vector receipt in browser to save as PDF"
+                        Click="ExportPdf_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Grid.Column="4"
+                        Content="Done / Close"
+                        Width="95"
+                        Height="36"
+                        Background="#334155"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        FontSize="11"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Click="Close_Click"
+                        IsDefault="True">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
