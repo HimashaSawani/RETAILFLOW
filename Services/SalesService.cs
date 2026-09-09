@@ -61,7 +61,10 @@ public class SalesService
         decimal discount, 
         string paymentMethod = "Cash", 
         decimal amountTendered = 0, 
-        decimal changeDue = 0)
+        decimal changeDue = 0,
+        Customer? customer = null,
+        int pointsToRedeem = 0,
+        string cashierName = "Cashier")
     {
         if (cartItems == null || !cartItems.Any())
         {
@@ -147,6 +150,26 @@ public class SalesService
                 sale.ChangeDue = 0;
             }
 
+            int pointsEarned = (int)(sale.Total / 100);
+            int finalBalance = 0;
+
+            if (customer != null)
+            {
+                sale.CustomerId = customer.Id;
+                sale.CustomerPhone = customer.PhoneNumber;
+                sale.CustomerName = customer.Name;
+                sale.LoyaltyPointsEarned = pointsEarned;
+                sale.LoyaltyPointsRedeemed = pointsToRedeem;
+
+                var dbCustomer = await _context.Customers.FindAsync(customer.Id);
+                if (dbCustomer != null)
+                {
+                    dbCustomer.LoyaltyPoints = Math.Max(0, dbCustomer.LoyaltyPoints - pointsToRedeem) + pointsEarned;
+                    dbCustomer.TotalSpent += sale.Total;
+                    finalBalance = dbCustomer.LoyaltyPoints;
+                }
+            }
+
             _context.Sales.Add(sale);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -161,7 +184,13 @@ public class SalesService
                 Total = sale.Total,
                 PaymentMethod = sale.PaymentMethod,
                 AmountTendered = sale.AmountTendered,
-                ChangeDue = sale.ChangeDue
+                ChangeDue = sale.ChangeDue,
+                CashierName = cashierName,
+                CustomerName = customer?.Name,
+                CustomerPhone = customer?.PhoneNumber,
+                LoyaltyPointsEarned = pointsEarned,
+                LoyaltyPointsRedeemed = pointsToRedeem,
+                CustomerPointsBalance = finalBalance
             };
         }
         catch
