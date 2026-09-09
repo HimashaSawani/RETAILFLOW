@@ -52,7 +52,7 @@
         </Border>
 
         <!-- Receipt Content -->
-        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+        <Border x:Name="ReceiptPrintArea" Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <!-- Items Section Title -->
@@ -93,7 +93,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- Financial Summary -->
+                    <!-- Financial & Payment Summary -->
                     <StackPanel Margin="0,16,0,0">
                         <Grid Margin="0,0,0,6">
                             <Grid.ColumnDefinitions>
@@ -113,9 +113,9 @@
                             <TextBlock Grid.Column="1" Text="{Binding Discount, StringFormat='- Rs. {0:N2}'}" FontSize="14" FontWeight="SemiBold" Foreground="#DC2626"/>
                         </Grid>
 
-                        <Border Height="1" Background="#E2E8F0" Margin="0,6,0,8"/>
+                        <Border Height="1" Background="#E2E8F0" Margin="0,4,0,6"/>
 
-                        <Grid>
+                        <Grid Margin="0,0,0,8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -123,16 +123,71 @@
                             <TextBlock Text="TOTAL:" FontSize="17" FontWeight="Bold" Foreground="#0F172A"/>
                             <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat='Rs. {0:N2}'}" FontSize="20" FontWeight="Bold" Foreground="#15803D"/>
                         </Grid>
+
+                        <Border Height="1" Background="#CBD5E1" Margin="0,2,0,8"/>
+
+                        <!-- Payment Details -->
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Payment Method:" FontSize="13" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding PaymentMethod}" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Amount Tendered / Paid:" FontSize="13" Foreground="#64748B"/>
+                            <TextBlock Grid.Column="1" Text="{Binding AmountTendered, StringFormat='Rs. {0:N2}'}" FontSize="13" FontWeight="SemiBold" Foreground="#0F766E"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Change Given:" FontSize="13" FontWeight="Bold" Foreground="#15803D"/>
+                            <TextBlock Grid.Column="1" Text="{Binding ChangeDue, StringFormat='Rs. {0:N2}'}" FontSize="14" FontWeight="Bold" Foreground="#15803D"/>
+                        </Grid>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
-        <!-- Close / New Sale Button -->
-        <Button Grid.Row="2"
-                Content="Done / New Sale"
-                Style="{StaticResource PrintCloseBtnStyle}"
-                Command="{Binding CloseCommand}"
-                IsDefault="True"/>
+        <!-- Action Buttons -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Content="🖨 Print / PDF Receipt"
+                    Height="42"
+                    Background="#0F766E"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    FontSize="13"
+                    Cursor="Hand"
+                    BorderThickness="0"
+                    Command="{Binding PrintCommand}">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="8"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button Grid.Column="2"
+                    Content="Done / New Sale"
+                    Style="{StaticResource PrintCloseBtnStyle}"
+                    Command="{Binding CloseCommand}"
+                    IsDefault="True"/>
+        </Grid>
     </Grid>
 </Window>
