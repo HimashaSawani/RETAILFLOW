@@ -192,36 +192,12 @@ The **Sales Dashboard** provides immediate business intelligence to retail manag
 ## Screenshots
 
 ### 1. Main Navigation & Dashboard
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ RF  RETAILFLOW | Retail Management & POS             [Active: Dashboard]    │
-├──────────────┬──────────────────────────────────────────────────────────────┤
-│ 📊 Dashboard │  TODAY'S SALES       TRANSACTIONS       PRODUCTS    LOW STOCK│
-│ 📦 Products  │   Rs. 24,500              18              125           7    │
-│ 🛒 Sales     │ ──────────────────────────────────────────────────────────── │
-│ 📈 Stock     │  Best-Selling Products          Sales Chart (Last 7 Days)    │
-│ 📜 Transactions Coca Cola      42 units               █   █                 │
-│              │  Bread          31 units         █     █   █   █             │
-│              │  Milk Powder    18 units       Mon Tue Wed Thu Fri Sat Sun   │
-└──────────────┴──────────────────────────────────────────────────────────────┘
-```
+<img width="1485" height="937" alt="image" src="https://github.com/user-attachments/assets/97d6d474-8ba8-4539-a6e9-6e463e077cbc" />
+
 
 ### 2. Point of Sale (POS) & Cart
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ RF  RETAILFLOW | Retail Management & POS                 [Active: Sales]    │
-├──────────────┬───────────────────────────────┬──────────────────────────────┤
-│ 📊 Dashboard │ Product Selection             │ Cart                         │
-│ 📦 Products  │ Product: [ Coca Cola (P001) ] │ Product     Qty  Price Total │
-│ 🛒 Sales     │ Unit Price: Rs. 180.00        │ Coca Cola    2    180   360  │
-│ 📈 Stock     │ Available: 25                 │ Bread        1    220   220  │
-│ 📜 Transactions Quantity: [ 2 ]              │ ──────────────────────────── │
-│              │ [ 🛒 Add to Cart ]            │ Subtotal:           Rs. 580  │
-│              │                               │ Discount:           Rs.   0  │
-│              │                               │ TOTAL:              Rs. 580  │
-│              │                               │ [ COMPLETE SALE ]            │
-└──────────────┴───────────────────────────────┴──────────────────────────────┘
-```
+<img width="1478" height="932" alt="image" src="https://github.com/user-attachments/assets/26ad96ba-e30a-458a-9a15-c4f4f415bf52" />
+
 
 ---
 
