@@ -16,6 +16,15 @@ public partial class MainWindow : Window
         _viewModel = new MainViewModel();
         DataContext = _viewModel;
 
-        Loaded += async (_, _) => await _viewModel.InitializeAsync();
+        Loaded += async (_, _) =>
+        {
+            await _viewModel.InitializeAsync();
+            _viewModel.ScannerListener.Attach(this);
+        };
+
+        Closed += (_, _) =>
+        {
+            _viewModel.ScannerListener.Detach(this);
+        };
     }
 }

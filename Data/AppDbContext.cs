@@ -10,6 +10,8 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<Sale> Sales { get; set; } = null!;
     public DbSet<SaleItem> SaleItems { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Customer> Customers { get; set; } = null!;
 
     public AppDbContext()
     {
@@ -73,5 +75,32 @@ public class AppDbContext : DbContext
                   .HasForeignKey(d => d.ProductId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
+
+        // Configure Users
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.Username).IsUnique();
+            entity.Property(e => e.FullName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PinCode).IsRequired().HasMaxLength(10);
+        });
+
+        // Configure Customers
+        modelBuilder.Entity<Customer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(20);
+            entity.HasIndex(e => e.PhoneNumber).IsUnique();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.TotalSpent).HasPrecision(18, 2);
+        });
+
+        // Configure Customer Relationship on Sale
+        modelBuilder.Entity<Sale>()
+               .HasOne(s => s.Customer)
+               .WithMany()
+               .HasForeignKey(s => s.CustomerId)
+               .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -42,6 +42,62 @@ public partial class App : Application
             try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN PaymentMethod TEXT DEFAULT 'Cash';"); } catch { }
             try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN AmountTendered NUMERIC DEFAULT 0;"); } catch { }
             try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN ChangeDue NUMERIC DEFAULT 0;"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN CustomerId INTEGER NULL;"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN CustomerPhone TEXT NULL;"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN CustomerName TEXT NULL;"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN LoyaltyPointsEarned INTEGER DEFAULT 0;"); } catch { }
+            try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, "ALTER TABLE Sales ADD COLUMN LoyaltyPointsRedeemed INTEGER DEFAULT 0;"); } catch { }
+
+            // Ensure Users table exists
+            try
+            {
+                Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database,
+                    @"CREATE TABLE IF NOT EXISTS Users (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Username TEXT NOT NULL UNIQUE,
+                        FullName TEXT NOT NULL,
+                        Role INTEGER NOT NULL,
+                        PinCode TEXT NOT NULL,
+                        IsActive INTEGER NOT NULL DEFAULT 1,
+                        CreatedAt TEXT NOT NULL
+                    );");
+            }
+            catch { }
+
+            // Ensure Customers table exists
+            try
+            {
+                Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database,
+                    @"CREATE TABLE IF NOT EXISTS Customers (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        PhoneNumber TEXT NOT NULL UNIQUE,
+                        Name TEXT NOT NULL,
+                        LoyaltyPoints INTEGER NOT NULL DEFAULT 0,
+                        TotalSpent NUMERIC NOT NULL DEFAULT 0,
+                        CreatedAt TEXT NOT NULL
+                    );");
+            }
+            catch { }
+
+            // Seed default users if empty
+            if (!System.Linq.Queryable.Any(context.Users))
+            {
+                context.Users.AddRange(
+                    new RetailFlow.Models.User { Username = "manager", FullName = "Store Manager", Role = RetailFlow.Models.UserRole.StoreManager, PinCode = "1234" },
+                    new RetailFlow.Models.User { Username = "cashier", FullName = "Front Cashier", Role = RetailFlow.Models.UserRole.Cashier, PinCode = "0000" }
+                );
+                context.SaveChanges();
+            }
+
+            // Seed sample loyalty customers if empty
+            if (!System.Linq.Queryable.Any(context.Customers))
+            {
+                context.Customers.AddRange(
+                    new RetailFlow.Models.Customer { PhoneNumber = "0771234567", Name = "Nimal Perera", LoyaltyPoints = 250, TotalSpent = 25000 },
+                    new RetailFlow.Models.Customer { PhoneNumber = "0719876543", Name = "Sunethra Silva", LoyaltyPoints = 120, TotalSpent = 12000 }
+                );
+                context.SaveChanges();
+            }
         }
         catch (Exception ex)
         {
