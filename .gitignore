@@ -1,0 +1,22 @@
+## Build and Output Folders
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+## Visual Studio / VS Code / JetBrains Rider
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+## SQLite Databases generated at runtime
+*.db
+*.db-shm
+*.db-wal
+
+## Logs / Temp
+*.log
+[Tt]emp/
