@@ -207,6 +207,32 @@ RetailFlow/
 
 ## 🔒 Reliability & Exception Handling
 
+<<<<<<< HEAD
 - **Crash-Proof Application Core**: Global exception handlers in `App.xaml.cs` catch all runtime exceptions gracefully across `DispatcherUnhandledException`, `AppDomain.UnhandledException`, and `TaskScheduler.UnobservedTaskException`, displaying clear notification dialogs rather than crashing.
 - **Concurrency & Concurrency Protection**: Database writes are atomic. If a product has only 2 units available and a cashier attempts to sell 3, the inventory guard blocks the transaction before database submission.
 - **Spooler Fallbacks**: If a physical thermal printer is powered off or unplugged, raw spooler exceptions are captured gracefully, falling back to the virtual thermal simulator preview without interrupting the POS sale flow.
+=======
+The **Sales Dashboard** provides immediate business intelligence to retail managers:
+1. **Real-time KPI Tiles**: Today's Revenue, Transaction Count, Total Catalog Items, and Urgent Low-Stock Alerts.
+2. **Top Selling Products**: Dynamically aggregates units sold and revenue from all transaction line items.
+3. **Weekly Sales Bar Chart**: A lightweight XAML chart displaying sales volume over the last 7 days with weekday headers.
+
+---
+
+## Screenshots
+
+### 1. Main Navigation & Dashboard
+<img width="1485" height="937" alt="image" src="https://github.com/user-attachments/assets/97d6d474-8ba8-4539-a6e9-6e463e077cbc" />
+
+
+### 2. Point of Sale (POS) & Cart
+<img width="1478" height="932" alt="image" src="https://github.com/user-attachments/assets/26ad96ba-e30a-458a-9a15-c4f4f415bf52" />
+
+
+---
+
+## Error Handling & Reliability
+
+- **Never-Crash Architecture**: Global unhandled exception handlers (`DispatcherUnhandledException`, `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException`) in `App.xaml.cs` catch all runtime exceptions gracefully and display helpful alerts rather than crashing.
+- **ACID Reliability**: Database operations utilize transactions with automatic rollback on error.
+>>>>>>> ef50f0cab76357520f56a81dc7c2f1be4f38198d
