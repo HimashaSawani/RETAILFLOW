@@ -25,4 +25,12 @@ public class SaleReceipt
     public string PaymentMethod { get; set; } = "Cash";
     public decimal AmountTendered { get; set; }
     public decimal ChangeDue { get; set; }
+
+    // Cashier & Customer Loyalty
+    public string CashierName { get; set; } = "Cashier";
+    public string? CustomerName { get; set; }
+    public string? CustomerPhone { get; set; }
+    public int LoyaltyPointsEarned { get; set; }
+    public int LoyaltyPointsRedeemed { get; set; }
+    public int CustomerPointsBalance { get; set; }
 }

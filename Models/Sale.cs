@@ -34,5 +34,15 @@ public class Sale
     [Column(TypeName = "decimal(18,2)")]
     public decimal ChangeDue { get; set; }
 
+    public int? CustomerId { get; set; }
+    [MaxLength(20)]
+    public string? CustomerPhone { get; set; }
+    [MaxLength(100)]
+    public string? CustomerName { get; set; }
+    public int LoyaltyPointsEarned { get; set; } = 0;
+    public int LoyaltyPointsRedeemed { get; set; } = 0;
+
+    public virtual Customer? Customer { get; set; }
+
     public virtual ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
 }
