@@ -58,14 +58,23 @@
         <!-- Search / Filter -->
         <Grid Grid.Row="1" Margin="0,0,0,18">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="360"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="160"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <TextBox Grid.Column="0"
                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource SearchTextBoxStyle}"
-                     Tag="Search by Invoice # (e.g. INV-0001)..."/>
+                     Style="{StaticResource SearchTextBoxStyle}"/>
+
+            <ComboBox Grid.Column="2"
+                      ItemsSource="{Binding DateFilters}"
+                      SelectedItem="{Binding SelectedDateFilter}"
+                      Height="40"
+                      FontSize="14"
+                      VerticalContentAlignment="Center"
+                      ToolTip="Filter by Date"/>
         </Grid>
 
         <!-- Workspace: Transaction List (Left) + Detail Panel (Right) -->
@@ -136,30 +145,30 @@
                         </DataGrid.RowStyle>
 
                         <DataGrid.Columns>
-                            <!-- Transaction # -->
-                            <DataGridTextColumn Header="Transaction" Binding="{Binding TransactionNumber}" Width="130">
+                            <!-- Invoice # -->
+                            <DataGridTextColumn Header="Invoice #" Binding="{Binding TransactionNumber}" Width="120">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Foreground" Value="#2563EB"/>
+                                        <Setter Property="Foreground" Value="#0F766E"/>
                                         <Setter Property="Padding" Value="12,0"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <!-- Date -->
-                            <DataGridTextColumn Header="Date" Binding="{Binding FormattedDate}" Width="140">
+                            <!-- Date / Time -->
+                            <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding FormattedDate}" Width="140">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="#475569"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
                                         <Setter Property="Padding" Value="12,0"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <!-- Items count -->
+                            <!-- Items Count -->
                             <DataGridTextColumn Header="Items" Binding="{Binding TotalItems}" Width="80">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -171,11 +180,11 @@
                             </DataGridTextColumn>
 
                             <!-- Total -->
-                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="*">
+                            <DataGridTextColumn Header="Total Amount" Binding="{Binding Total, StringFormat='Rs. {0:N2}'}" Width="*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Foreground" Value="#0F766E"/>
+                                        <Setter Property="Foreground" Value="#15803D"/>
                                         <Setter Property="Padding" Value="12,0"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="TextAlignment" Value="Right"/>
@@ -187,29 +196,44 @@
                 </Grid>
             </Border>
 
-            <!-- Detailed Receipt Panel (Right) -->
-            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+            <!-- Detailed Breakdown Drawer (Right) -->
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderBrush="#CBD5E1"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Visibility="{Binding HasSelectedTransaction, Converter={StaticResource BoolToVis}}">
                 <Grid>
-                    <!-- Detail Content -->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                  Visibility="{Binding HasSelectedTransaction, Converter={StaticResource BoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Drawer Header -->
+                    <TextBlock Grid.Row="0"
+                               Text="{Binding SelectedTransaction.TransactionNumber, StringFormat='Transaction: {0}'}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#0F172A"/>
+
+                    <!-- Date & Time -->
+                    <StackPanel Grid.Row="1" Margin="0,6,0,12">
+                        <TextBlock Text="Date:" FontSize="12" Foreground="#94A3B8"/>
+                        <TextBlock Text="{Binding SelectedTransaction.FormattedFullDate}" FontSize="14" Foreground="#475569" FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="2" Height="1" Background="#E2E8F0" Margin="0,0,0,14"/>
+
+                    <!-- Scrollable Receipt Details -->
+                    <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
                         <StackPanel>
-                            <!-- Transaction Header -->
-                            <TextBlock Text="{Binding SelectedTransaction.TransactionNumber, StringFormat='Transaction: {0}'}"
-                                       FontSize="18"
-                                       FontWeight="Bold"
-                                       Foreground="#0F172A"
-                                       Margin="0,0,0,4"/>
+                            <!-- Items Breakdown Title -->
+                            <TextBlock Text="Items Breakdown:" FontWeight="Bold" FontSize="13" Foreground="#334155" Margin="0,0,0,10"/>
 
-                            <TextBlock Text="Date:" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" Margin="0,8,0,2"/>
-                            <TextBlock Text="{Binding SelectedTransaction.FormattedFullDate}" FontSize="14" Foreground="#1E293B" Margin="0,0,0,14"/>
-
-                            <!-- Divider -->
-                            <Border Height="1" Background="#E2E8F0" Margin="0,0,0,14"/>
-
-                            <!-- Line Items Breakdown -->
-                            <TextBlock Text="Items Breakdown:" FontSize="13" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,8"/>
-
+                            <!-- Items List -->
                             <ItemsControl ItemsSource="{Binding SelectedTransaction.SaleItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -221,13 +245,15 @@
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0">
                                                     <TextBlock Text="{Binding Product.Name}" FontWeight="SemiBold" FontSize="14" Foreground="#1E293B"/>
-                                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                        <TextBlock Text="{Binding Quantity}" Foreground="#64748B" FontSize="12"/>
-                                                        <TextBlock Text=" × " Foreground="#64748B" FontSize="12"/>
-                                                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0}'}" Foreground="#64748B" FontSize="12"/>
-                                                        <TextBlock Text=" = " Foreground="#64748B" FontSize="12"/>
-                                                        <TextBlock Text="{Binding Subtotal, StringFormat='{}{0:N0}'}" Foreground="#64748B" FontSize="12"/>
-                                                    </StackPanel>
+                                                    <TextBlock Foreground="#64748B" FontSize="12">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0} × {1:N0} = {2:N0}">
+                                                                <Binding Path="Quantity"/>
+                                                                <Binding Path="UnitPrice"/>
+                                                                <Binding Path="Subtotal"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
                                                 </StackPanel>
                                                 <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rs. {0:N0}'}" FontWeight="Bold" FontSize="14" Foreground="#0F766E" VerticalAlignment="Center"/>
                                             </Grid>
@@ -237,9 +263,7 @@
                             </ItemsControl>
 
                             <!-- Financial Summary -->
-                            <Border Height="1" Background="#E2E8F0" Margin="0,14,0,14"/>
-
-                            <Grid Margin="0,0,0,6">
+                            <Grid Margin="0,14,0,6">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -248,7 +272,7 @@
                                 <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.Subtotal, StringFormat='Rs. {0:N2}'}" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
                             </Grid>
 
-                            <Grid Margin="0,0,0,8">
+                            <Grid Margin="0,0,0,6">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -257,15 +281,43 @@
                                 <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.Discount, StringFormat='- Rs. {0:N2}'}" FontSize="14" FontWeight="SemiBold" Foreground="#DC2626"/>
                             </Grid>
 
-                            <Border Height="1" Background="#CBD5E1" Margin="0,0,0,10"/>
+                            <Border Height="1" Background="#CBD5E1" Margin="0,2,0,8"/>
 
-                            <Grid>
+                            <Grid Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="TOTAL:" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.Total, StringFormat='Rs. {0:N0}'}" FontSize="20" FontWeight="Bold" Foreground="#15803D"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.Total, StringFormat='Rs. {0:N2}'}" FontSize="20" FontWeight="Bold" Foreground="#15803D"/>
+                            </Grid>
+
+                            <!-- Payment Details -->
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Payment Method:" FontSize="13" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.PaymentMethod}" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Amount Tendered:" FontSize="13" Foreground="#64748B"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.AmountTendered, StringFormat='Rs. {0:N2}'}" FontSize="13" FontWeight="SemiBold" Foreground="#0F766E"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Change Given:" FontSize="13" FontWeight="Bold" Foreground="#15803D"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedTransaction.ChangeDue, StringFormat='Rs. {0:N2}'}" FontSize="14" FontWeight="Bold" Foreground="#15803D"/>
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
