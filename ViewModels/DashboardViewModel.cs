@@ -12,6 +12,7 @@ public class DashboardViewModel : ViewModelBase
     private readonly SalesService _salesService;
 
     private decimal _todaySales;
+    private decimal _todayGrossProfit;
     private int _todayTransactions;
     private int _totalProducts;
     private int _lowStockProducts;
@@ -20,11 +21,18 @@ public class DashboardViewModel : ViewModelBase
 
     public ObservableCollection<TopProductDto> TopProducts { get; } = new();
     public ObservableCollection<DailySalesDto> WeeklySales { get; } = new();
+    public ObservableCollection<RetailFlow.Models.Product> CriticalLowStockItems { get; } = new();
 
     public decimal TodaySales
     {
         get => _todaySales;
         set => SetProperty(ref _todaySales, value);
+    }
+
+    public decimal TodayGrossProfit
+    {
+        get => _todayGrossProfit;
+        set => SetProperty(ref _todayGrossProfit, value);
     }
 
     public int TodayTransactions
@@ -75,6 +83,7 @@ public class DashboardViewModel : ViewModelBase
             var metrics = await _salesService.GetDashboardMetricsAsync();
 
             TodaySales = metrics.TodaySales;
+            TodayGrossProfit = metrics.TodayGrossProfit;
             TodayTransactions = metrics.TodayTransactions;
             TotalProducts = metrics.TotalProducts;
             LowStockProducts = metrics.LowStockProducts;
@@ -89,6 +98,12 @@ public class DashboardViewModel : ViewModelBase
             foreach (var day in metrics.WeeklySales)
             {
                 WeeklySales.Add(day);
+            }
+
+            CriticalLowStockItems.Clear();
+            foreach (var item in metrics.CriticalLowStockItems)
+            {
+                CriticalLowStockItems.Add(item);
             }
 
             StatusMessage = "Dashboard updated.";

@@ -51,6 +51,9 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Subtotal).HasPrecision(18, 2);
             entity.Property(e => e.Discount).HasPrecision(18, 2);
             entity.Property(e => e.Total).HasPrecision(18, 2);
+            entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+            entity.Property(e => e.AmountTendered).HasPrecision(18, 2);
+            entity.Property(e => e.ChangeDue).HasPrecision(18, 2);
         });
 
         // Configure SaleItems & Relationships

@@ -25,8 +25,48 @@ public class PosViewModel : ViewModelBase
     private bool _isProcessingSale;
     private CartItemViewModel? _selectedCartItem;
 
+    private string _selectedPaymentMethod = "Cash";
+    private decimal _amountTendered;
+    private decimal _changeDue;
+
+    public ObservableCollection<string> PaymentMethods { get; } = new() { "Cash", "Card", "QR / Transfer" };
+
     public ObservableCollection<Product> AvailableProducts { get; } = new();
     public ObservableCollection<CartItemViewModel> CartItems { get; } = new();
+
+    public string SelectedPaymentMethod
+    {
+        get => _selectedPaymentMethod;
+        set
+        {
+            if (SetProperty(ref _selectedPaymentMethod, value))
+            {
+                OnPropertyChanged(nameof(IsCashPayment));
+                RecalculateChange();
+            }
+        }
+    }
+
+    public bool IsCashPayment => SelectedPaymentMethod == "Cash";
+
+    public decimal AmountTendered
+    {
+        get => _amountTendered;
+        set
+        {
+            if (value < 0) value = 0;
+            if (SetProperty(ref _amountTendered, value))
+            {
+                RecalculateChange();
+            }
+        }
+    }
+
+    public decimal ChangeDue
+    {
+        get => _changeDue;
+        private set => SetProperty(ref _changeDue, value);
+    }
 
     public Product? SelectedProduct
     {
@@ -64,7 +104,7 @@ public class PosViewModel : ViewModelBase
 
             if (SetProperty(ref _discount, value))
             {
-                OnPropertyChanged(nameof(Total));
+                RecalculateTotals();
             }
         }
     }
@@ -122,6 +162,8 @@ public class PosViewModel : ViewModelBase
     public ICommand ClearCartCommand { get; }
     public ICommand CompleteSaleCommand { get; }
     public ICommand RefreshProductsCommand { get; }
+    public ICommand SetExactTenderCommand { get; }
+    public ICommand AddTenderPresetCommand { get; }
 
     public Action<SaleReceipt>? OpenReceiptDialog { get; set; }
     public Action<string, string>? ShowMessageDialog { get; set; }
@@ -136,6 +178,14 @@ public class PosViewModel : ViewModelBase
         ClearCartCommand = new RelayCommand(ExecuteClearCart, () => CartItems.Count > 0);
         CompleteSaleCommand = new RelayCommand(async () => await ExecuteCompleteSaleAsync(), () => CartItems.Count > 0 && !IsProcessingSale);
         RefreshProductsCommand = new RelayCommand(async () => await LoadProductsAsync());
+        SetExactTenderCommand = new RelayCommand(() => AmountTendered = Total);
+        AddTenderPresetCommand = new RelayCommand<object>(param =>
+        {
+            if (param != null && decimal.TryParse(param.ToString(), out decimal addAmount))
+            {
+                AmountTendered += addAmount;
+            }
+        });
     }
 
     public async Task LoadProductsAsync()
@@ -243,6 +293,7 @@ public class PosViewModel : ViewModelBase
     {
         CartItems.Clear();
         Discount = 0;
+        AmountTendered = 0;
         ClearValidation();
         RecalculateTotals();
     }
@@ -251,6 +302,19 @@ public class PosViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(Subtotal));
         OnPropertyChanged(nameof(Total));
+        RecalculateChange();
+    }
+
+    private void RecalculateChange()
+    {
+        if (IsCashPayment)
+        {
+            ChangeDue = AmountTendered >= Total ? AmountTendered - Total : 0;
+        }
+        else
+        {
+            ChangeDue = 0;
+        }
     }
 
     private async Task ExecuteCompleteSaleAsync()
@@ -261,6 +325,33 @@ public class PosViewModel : ViewModelBase
             return;
         }
 
+        decimal finalTendered = AmountTendered;
+        decimal finalChange = ChangeDue;
+
+        if (IsCashPayment)
+        {
+            if (AmountTendered <= 0)
+            {
+                // Auto-assume exact cash if user left tender field empty
+                finalTendered = Total;
+                finalChange = 0;
+            }
+            else if (AmountTendered < Total)
+            {
+                ValidationMessage = $"❌ Insufficient Cash Tendered!\nTendered: Rs. {AmountTendered:N2} is less than Total: Rs. {Total:N2}. Please collect remaining Rs. {(Total - AmountTendered):N2}.";
+                return;
+            }
+            else
+            {
+                finalChange = AmountTendered - Total;
+            }
+        }
+        else
+        {
+            finalTendered = Total;
+            finalChange = 0;
+        }
+
         try
         {
             IsProcessingSale = true;
@@ -269,14 +360,20 @@ public class PosViewModel : ViewModelBase
             // Prepare items for transaction
             var cartPayload = CartItems.Select(ci => (ci.ProductId, ci.Quantity)).ToList();
 
-            // Execute atomic database transaction (Phase 11 & Phase 12)
-            var receipt = await _salesService.ExecuteSaleTransactionAsync(cartPayload, Discount);
+            // Execute atomic database transaction
+            var receipt = await _salesService.ExecuteSaleTransactionAsync(
+                cartPayload, 
+                Discount, 
+                SelectedPaymentMethod, 
+                finalTendered, 
+                finalChange);
 
-            SuccessMessage = $"✔ Sale Completed Successfully!\nInvoice: #{receipt.InvoiceNumber} | Total: Rs. {receipt.Total:N2}";
+            SuccessMessage = $"✔ Sale Completed!\nInvoice: #{receipt.InvoiceNumber} | Paid: Rs. {receipt.AmountTendered:N2} | Change: Rs. {receipt.ChangeDue:N2}";
 
             // Reset cart
             CartItems.Clear();
             Discount = 0;
+            AmountTendered = 0;
             RecalculateTotals();
 
             // Refresh available product stocks
