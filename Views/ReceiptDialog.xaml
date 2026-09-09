@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:RetailFlow.ViewModels"
         mc:Ignorable="d"
         Title="Sale Completed - Receipt"
-        Height="560" Width="480"
+        Height="620" Width="520"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#F8FAFC"
@@ -153,6 +153,38 @@
                             <TextBlock Text="Change Given:" FontSize="13" FontWeight="Bold" Foreground="#15803D"/>
                             <TextBlock Grid.Column="1" Text="{Binding ChangeDue, StringFormat='Rs. {0:N2}'}" FontSize="14" FontWeight="Bold" Foreground="#15803D"/>
                         </Grid>
+
+                        <!-- Customer Loyalty Summary -->
+                        <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="⭐ Customer Loyalty Rewards" FontWeight="Bold" FontSize="12" Foreground="#2563EB" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding CustomerName, StringFormat='Customer: {0}'}" FontSize="12" Foreground="#334155"/>
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Points Redeemed:" FontSize="11" Foreground="#64748B"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding LoyaltyPointsRedeemed, StringFormat='-{0} pts'}" FontSize="11" FontWeight="SemiBold" Foreground="#DC2626"/>
+                                </Grid>
+                                <Grid Margin="0,2,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Points Earned (This Order):" FontSize="11" Foreground="#64748B"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding LoyaltyPointsEarned, StringFormat='+{0} pts'}" FontSize="11" FontWeight="SemiBold" Foreground="#16A34A"/>
+                                </Grid>
+                                <Grid Margin="0,2,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Updated Points Balance:" FontSize="11" FontWeight="Bold" Foreground="#0F172A"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding CustomerPointsBalance, StringFormat='{}{0} pts'}" FontSize="12" FontWeight="Bold" Foreground="#2563EB"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
@@ -160,32 +192,84 @@
 
         <!-- Action Buttons -->
         <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Button Grid.Column="0"
-                    Content="🖨 Print / PDF Receipt"
-                    Height="42"
-                    Background="#0F766E"
-                    Foreground="White"
-                    FontWeight="Bold"
-                    FontSize="13"
-                    Cursor="Hand"
-                    BorderThickness="0"
-                    Command="{Binding PrintCommand}">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="8"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+            <!-- Row 0: Three Print & Export Options -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="2"
-                    Content="Done / New Sale"
+                <Button Grid.Column="0"
+                        Content="🖨️ ESC/POS Thermal"
+                        Height="40"
+                        Background="#1E293B"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="11"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        ToolTip="Direct thermal receipt printing / simulator"
+                        Command="{Binding PrintEscPosCommand}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Grid.Column="2"
+                        Content="🖨️ System / PDF Print"
+                        Height="40"
+                        Background="#0F766E"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="11"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        ToolTip="Print via Windows Print Dialog (Microsoft Print to PDF or physical printer)"
+                        Command="{Binding PrintCommand}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Grid.Column="4"
+                        Content="📄 Open Digital / PDF"
+                        Height="40"
+                        Background="#2563EB"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="11"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        ToolTip="Generate formatted vector HTML/PDF receipt and open in browser"
+                        Command="{Binding ExportHtmlCommand}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </Grid>
+
+            <!-- Row 2: Done / Close Button -->
+            <Button Grid.Row="2"
+                    Content="Done / New Sale [Enter]"
                     Style="{StaticResource PrintCloseBtnStyle}"
+                    Height="38"
+                    FontSize="13"
+                    Background="#334155"
                     Command="{Binding CloseCommand}"
                     IsDefault="True"/>
         </Grid>
