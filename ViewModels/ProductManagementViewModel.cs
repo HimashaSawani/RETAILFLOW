@@ -67,9 +67,11 @@ public class ProductManagementViewModel : ViewModelBase
     public ICommand EditProductCommand { get; }
     public ICommand DeleteProductCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand PrintBarcodeCommand { get; }
 
     // Action delegates for UI interactions (opening dialogs, message boxes)
     public Func<Product?, Task<bool>>? OpenProductFormDialog { get; set; }
+    public Action<Product>? OpenBarcodePrintDialog { get; set; }
     public Func<string, string, bool>? ShowConfirmationDialog { get; set; }
     public Action<string, string>? ShowMessageDialog { get; set; }
 
@@ -82,6 +84,13 @@ public class ProductManagementViewModel : ViewModelBase
         AddProductCommand = new RelayCommand(async () => await ExecuteAddProductAsync());
         EditProductCommand = new RelayCommand(async () => await ExecuteEditProductAsync(), () => SelectedProduct != null);
         DeleteProductCommand = new RelayCommand(async () => await ExecuteDeleteProductAsync(), () => SelectedProduct != null);
+        PrintBarcodeCommand = new RelayCommand(() =>
+        {
+            if (SelectedProduct != null)
+            {
+                OpenBarcodePrintDialog?.Invoke(SelectedProduct);
+            }
+        }, () => SelectedProduct != null);
     }
 
     public async Task LoadProductsAsync()
