@@ -221,12 +221,13 @@ The **Sales Dashboard** provides immediate business intelligence to retail manag
 
 ## Screenshots
 
-### 1. Main Navigation & Dashboard
-<img width="1485" height="937" alt="image" src="https://github.com/user-attachments/assets/97d6d474-8ba8-4539-a6e9-6e463e077cbc" />
+### 1. Main Navigation & Dashboard (Cashier)
+<img width="1532" height="973" alt="image" src="https://github.com/user-attachments/assets/47c302b0-d41e-4eee-a43f-f69c9b51c6c9" />
 
 
-### 2. Point of Sale (POS) & Cart
-<img width="1478" height="932" alt="image" src="https://github.com/user-attachments/assets/26ad96ba-e30a-458a-9a15-c4f4f415bf52" />
+### 2. Main Navigation & Dashboard (Store Manage)
+
+<img width="1533" height="967" alt="image" src="https://github.com/user-attachments/assets/9b5113a8-83d7-4f9b-8a4f-b77a195aa1e9" />
 
 
 ---
